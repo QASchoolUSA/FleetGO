@@ -34,6 +34,8 @@ See [`.env.example`](.env.example):
 | `NEXT_PUBLIC_SANITY_*` | Sanity project / dataset |
 | `SANITY_API_READ_TOKEN` / `WRITE_TOKEN` | Optional until you connect Sanity |
 | `SANITY_REVALIDATE_SECRET` | On-demand revalidation webhook |
+| `INVENTORY_SYNC_SECRET` | Shared Bearer secret for `POST /api/inventory/sync` from Convex |
+| `AUTO_PUBLISH` | Optional; default publish live (set `false` for Sanity drafts) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 | `STRIPE_SECRET_KEY` | Stripe secret (test mode OK) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
@@ -50,7 +52,20 @@ See [`.env.example`](.env.example):
 npm run seed
 ```
 
-Product fields include `barcode`, `mpn`, `quantity`, and `convexProductKey` so inventory from the barcode mobile app can sync later.
+Product fields include `barcode`, `mpn`, `quantity`, and `convexProductKey` for inventory sync.
+
+### Inventory sync (from barcode mobile app)
+
+Convex posts enriched products to:
+
+```http
+POST /api/inventory/sync
+Authorization: Bearer <INVENTORY_SYNC_SECRET>
+```
+
+The route uploads image URLs into Sanity assets, resolve-or-creates brand/category refs, `createOrReplace`s `product.barcode.{upc}`, and revalidates `/shop` + `/p/[slug]`. Quantity-only updates are supported when catalog content is unchanged.
+
+Set the same `INVENTORY_SYNC_SECRET` on the Convex deployment (`FLEETGO_SYNC_URL` = this site’s origin).
 
 ## Stripe
 
@@ -79,9 +94,9 @@ Product fields include `barcode`, `mpn`, `quantity`, and `convexProductKey` so i
 | `/cart` / `/checkout` | Cart & Stripe |
 | `/studio` | Sanity Studio |
 
-## Convex bridge (future)
+## Convex bridge
 
-`src/lib/catalog/types.ts` and `getProductByBarcode` mirror the Inventory-Management-System Convex schema (`barcode`, `title`, `brand`, `mpn`, `images`, `quantity`). Sanity is the sellable catalog for v1; Convex will supply live stock / scanned products later via the same adapter interface.
+Inventory-Management-System Convex enriches scanned barcodes and publishes into Sanity via `/api/inventory/sync`. Storefront still reads Sanity through `getCatalog()`; mobile shows publish status from Convex `webSyncStatus` / `webSlug`.
 
 ## Scripts
 

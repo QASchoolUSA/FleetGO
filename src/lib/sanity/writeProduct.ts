@@ -295,6 +295,48 @@ async function notifyConvexDeleted(barcode: string) {
   }
 }
 
+/** Push absolute on-hand quantity from Sanity → Convex mobile catalog. */
+export async function notifyConvexQuantity(
+  barcode: string,
+  quantity: number,
+  convexProductKey?: string | null,
+) {
+  const siteUrl = process.env.CONVEX_SITE_URL?.replace(/\/$/, "");
+  const secret = process.env.INVENTORY_SYNC_SECRET;
+  if (!siteUrl || !secret) {
+    console.warn(
+      "CONVEX_SITE_URL or INVENTORY_SYNC_SECRET missing — skipped mobile quantity notify",
+    );
+    return;
+  }
+
+  const clean = barcode.replace(/\D/g, "") || barcode;
+  try {
+    const response = await fetch(`${siteUrl}/inventory/quantity`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secret}`,
+      },
+      body: JSON.stringify({
+        barcode: clean,
+        quantity,
+        ...(convexProductKey ? { convexProductKey } : {}),
+      }),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      console.warn(
+        "Convex quantity notify failed",
+        response.status,
+        text.slice(0, 200),
+      );
+    }
+  } catch (err) {
+    console.warn("Convex quantity notify error", err);
+  }
+}
+
 export async function patchInventoryQuantity(payload: QuantityOnlyPayload) {
   if (!sanityWriteClient) {
     throw new Error("Sanity write client is not configured");

@@ -7,6 +7,13 @@ export function absoluteUrl(path = "/"): string {
   return new URL(path, siteUrl).toString();
 }
 
+const defaultOgImage = {
+  url: "/og.jpg",
+  width: 1200,
+  height: 630,
+  alt: "FleetGo — Auto and semi truck parts",
+};
+
 export function baseMetadata(settings?: {
   siteName?: string;
   tagline?: string;
@@ -14,6 +21,7 @@ export function baseMetadata(settings?: {
   bingSiteVerification?: string;
 }): Metadata {
   const siteName = settings?.siteName || "FleetGo";
+  const title = `${siteName} | Auto & Semi Truck Parts`;
   const description =
     settings?.tagline ||
     "Shop auto and semi truck parts online. Fast search, vehicle fitment, and reliable delivery from FleetGo.";
@@ -29,7 +37,7 @@ export function baseMetadata(settings?: {
   return {
     metadataBase: new URL(siteUrl),
     title: {
-      default: `${siteName} | Auto & Semi Truck Parts`,
+      default: title,
       template: `%s | ${siteName}`,
     },
     description,
@@ -38,14 +46,16 @@ export function baseMetadata(settings?: {
       type: "website",
       locale: "en_US",
       siteName,
-      title: siteName,
+      title,
       description,
       url: siteUrl,
+      images: [defaultOgImage],
     },
     twitter: {
       card: "summary_large_image",
-      title: siteName,
+      title,
       description,
+      images: [defaultOgImage.url],
     },
     robots: {
       index: true,
@@ -63,7 +73,16 @@ export function productMetadata(product: CatalogProduct): Metadata {
     product.shortDescription ||
     product.description.slice(0, 155) ||
     `Buy ${product.title} at FleetGo. SKU ${product.sku}.`;
-  const images = product.images[0]?.url ? [product.images[0].url] : undefined;
+  const images = product.images[0]?.url
+    ? [
+        {
+          url: product.images[0].url,
+          width: 900,
+          height: 720,
+          alt: product.images[0].alt || product.title,
+        },
+      ]
+    : [defaultOgImage];
 
   return {
     title,
@@ -73,8 +92,15 @@ export function productMetadata(product: CatalogProduct): Metadata {
       title,
       description,
       url: absoluteUrl(`/p/${product.slug}`),
-      images,
+      siteName: "FleetGo",
       type: "website",
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [images[0].url],
     },
   };
 }
@@ -121,6 +147,7 @@ export function organizationJsonLd(settings: {
     url: absoluteUrl("/"),
     telephone: settings.phone,
     email: settings.email,
+    image: absoluteUrl("/og.jpg"),
     address: settings.address
       ? {
           "@type": "PostalAddress",

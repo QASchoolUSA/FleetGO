@@ -72,35 +72,37 @@ export function Header() {
             </span>
           </Link>
 
-          <div className="mx-2 hidden flex-1 md:block">
+          <div className="mx-2 hidden min-w-0 flex-1 md:block">
             <SearchBar />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setFinderOpen(true)}
-            className="hidden items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2 text-left text-sm transition hover:border-[var(--navy)] lg:inline-flex"
-          >
-            <Truck className="h-4 w-4 text-[var(--signal)]" />
-            <span className="max-w-[180px] truncate">
-              {vehicle ? vehicleLabel(vehicle) : "Select your vehicle"}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={openCart}
-            className="relative inline-flex h-10 items-center gap-2 rounded-md bg-[var(--navy)] px-3 text-sm font-semibold text-white"
-            aria-label="Open cart"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">Cart</span>
-            {count > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--signal)] px-1 text-[11px] font-bold text-white">
-                {count}
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => setFinderOpen(true)}
+              className="hidden items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2 text-left text-sm transition hover:border-[var(--navy)] lg:inline-flex"
+            >
+              <Truck className="h-4 w-4 text-[var(--signal)]" />
+              <span className="max-w-[180px] truncate">
+                {vehicle ? vehicleLabel(vehicle) : "Select your vehicle"}
               </span>
-            )}
-          </button>
+            </button>
+
+            <button
+              type="button"
+              onClick={openCart}
+              className="relative inline-flex h-10 items-center gap-2 rounded-md bg-[var(--navy)] px-3 text-sm font-semibold text-white"
+              aria-label="Open cart"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden sm:inline">Cart</span>
+              {count > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--signal)] px-1 text-[11px] font-bold text-white">
+                  {count}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="border-t border-[var(--line)] px-4 py-2 md:hidden">

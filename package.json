@@ -1,0 +1,42 @@
+{
+  "name": "fleetgo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "tsx scripts/seed.ts",
+    "typegen": "sanity schema extract && sanity typegen generate"
+  },
+  "dependencies": {
+    "@portabletext/react": "^8.0.1",
+    "@sanity/client": "^8.15.1",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.23.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.72.0",
+    "motion": "^14.12.0",
+    "next": "16.4.6",
+    "next-sanity": "^13.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sanity": "^6.23.0",
+    "stripe": "^23.1.0",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "^20.19.43",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^18.0.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "sanity-plugin-media": "^6.6.3",
+    "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}

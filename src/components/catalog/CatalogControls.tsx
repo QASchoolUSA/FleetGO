@@ -165,32 +165,34 @@ function FilterPanel({
             </button>
           ))}
         </div>
-        <div className="mt-3 grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-          <input
-            type="number"
-            inputMode="decimal"
-            min={0}
-            placeholder="Min"
-            value={minInput}
-            onChange={(e) => setMinInput(e.target.value)}
-            className="h-10 rounded-md border border-[var(--line)] bg-white px-3 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
-            aria-label="Minimum price"
-          />
-          <span className="text-xs text-[var(--ink-muted)]">to</span>
-          <input
-            type="number"
-            inputMode="decimal"
-            min={0}
-            placeholder="Max"
-            value={maxInput}
-            onChange={(e) => setMaxInput(e.target.value)}
-            className="h-10 rounded-md border border-[var(--line)] bg-white px-3 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
-            aria-label="Maximum price"
-          />
+        <div className="mt-3 flex min-w-0 flex-col gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              placeholder="Min"
+              value={minInput}
+              onChange={(e) => setMinInput(e.target.value)}
+              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
+              aria-label="Minimum price"
+            />
+            <span className="shrink-0 text-xs text-[var(--ink-muted)]">to</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              placeholder="Max"
+              value={maxInput}
+              onChange={(e) => setMaxInput(e.target.value)}
+              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
+              aria-label="Maximum price"
+            />
+          </div>
           <button
             type="button"
             onClick={applyCustomPrice}
-            className="h-10 rounded-md bg-[var(--surface-muted)] px-3 text-xs font-bold uppercase tracking-wide text-[var(--navy)]"
+            className="h-10 w-full rounded-md bg-[var(--surface-muted)] px-3 text-xs font-bold uppercase tracking-wide text-[var(--navy)]"
           >
             Go
           </button>

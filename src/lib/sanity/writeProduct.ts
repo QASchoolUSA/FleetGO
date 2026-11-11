@@ -222,6 +222,79 @@ export async function syncInventoryProduct(payload: InventorySyncPayload) {
   };
 }
 
+export async function deleteInventoryProduct(
+  barcodeRaw: string,
+  opts?: { notifyConvex?: boolean },
+) {
+  if (!sanityWriteClient) {
+    throw new Error("Sanity write client is not configured");
+  }
+
+  const barcode = barcodeRaw.replace(/\D/g, "") || barcodeRaw;
+  const docId = productDocumentId(barcode);
+  const draftId = `drafts.${docId}`;
+  const client = sanityWriteClient;
+
+  const existing = await client.getDocument(docId);
+  const slug =
+    existing &&
+    typeof existing.slug === "object" &&
+    existing.slug &&
+    "current" in existing.slug
+      ? String((existing.slug as { current?: string }).current || "")
+      : "";
+
+  try {
+    await client.delete(docId);
+  } catch {
+    // may already be gone
+  }
+  try {
+    await client.delete(draftId);
+  } catch {
+    // draft may not exist
+  }
+
+  // Notify Convex so mobile catalogs drop the same barcode (skip when Convex initiated).
+  if (opts?.notifyConvex !== false) {
+    await notifyConvexDeleted(barcode);
+  }
+
+  return {
+    deleted: true as const,
+    sanityDocumentId: docId,
+    slug,
+  };
+}
+
+async function notifyConvexDeleted(barcode: string) {
+  const siteUrl = process.env.CONVEX_SITE_URL?.replace(/\/$/, "");
+  const secret = process.env.INVENTORY_SYNC_SECRET;
+  if (!siteUrl || !secret) {
+    console.warn(
+      "CONVEX_SITE_URL or INVENTORY_SYNC_SECRET missing — skipped mobile delete notify",
+    );
+    return;
+  }
+
+  try {
+    const response = await fetch(`${siteUrl}/inventory/deleted`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secret}`,
+      },
+      body: JSON.stringify({ barcode }),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      console.warn("Convex delete notify failed", response.status, text.slice(0, 200));
+    }
+  } catch (err) {
+    console.warn("Convex delete notify error", err);
+  }
+}
+
 export async function patchInventoryQuantity(payload: QuantityOnlyPayload) {
   if (!sanityWriteClient) {
     throw new Error("Sanity write client is not configured");

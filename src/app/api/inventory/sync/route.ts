@@ -1,6 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import {
+  deleteInventoryProduct,
   patchInventoryQuantity,
   syncInventoryProduct,
   type InventorySyncPayload,
@@ -128,6 +129,18 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (body.delete === true) {
+      const barcode = asString(body.barcode);
+      if (!barcode) {
+        return NextResponse.json({ error: "barcode is required" }, { status: 400 });
+      }
+      const result = await deleteInventoryProduct(barcode, {
+        notifyConvex: body.source !== "convex",
+      });
+      revalidatePaths(result.slug || undefined);
+      return NextResponse.json(result);
+    }
+
     const quantityOnly = parseQuantityOnly(body);
     if (quantityOnly) {
       const result = await patchInventoryQuantity(quantityOnly);

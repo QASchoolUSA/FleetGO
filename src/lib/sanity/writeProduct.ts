@@ -65,7 +65,7 @@ export async function ensureCategory(
 }
 
 const MAX_IMAGE_BYTES = 8_000_000;
-const MAX_IMAGES = 12;
+const MAX_IMAGES = 16;
 
 function filenameFromUrl(url: string, index: number): string {
   try {

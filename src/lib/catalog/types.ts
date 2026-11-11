@@ -72,13 +72,7 @@ export type SiteSettings = {
 };
 
 export type CatalogAdapter = {
-  getProducts: (opts?: {
-    category?: string;
-    brand?: string;
-    duty?: string;
-    q?: string;
-    featured?: boolean;
-  }) => Promise<CatalogProduct[]>;
+  getProducts: (opts?: import("./query").ProductQueryOpts) => Promise<CatalogProduct[]>;
   getProductBySlug: (slug: string) => Promise<CatalogProduct | null>;
   /** Stub for future Convex barcode lookup */
   getProductByBarcode: (barcode: string) => Promise<CatalogProduct | null>;

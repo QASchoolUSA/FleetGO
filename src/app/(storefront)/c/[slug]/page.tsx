@@ -2,17 +2,18 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Filters } from "@/components/catalog/Filters";
+import { CatalogControls } from "@/components/catalog/CatalogControls";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCatalog } from "@/lib/catalog/adapter";
+import { parseProductQuery } from "@/lib/catalog/query";
 import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const revalidate = 120;
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ duty?: string; brand?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -33,23 +34,20 @@ export async function generateStaticParams() {
 
 export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const query = await searchParams;
+  const raw = await searchParams;
+  const query = parseProductQuery(raw);
   const catalog = getCatalog();
   const category = await catalog.getCategoryBySlug(slug);
   if (!category) notFound();
 
   const [products, categories, brands] = await Promise.all([
-    catalog.getProducts({
-      category: slug,
-      duty: query.duty,
-      brand: query.brand,
-    }),
+    catalog.getProducts({ ...query, category: slug }),
     catalog.getCategories(),
     catalog.getBrands(),
   ]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Home", path: "/" },
@@ -58,7 +56,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         ])}
       />
 
-      <nav className="mb-4 text-sm text-[var(--ink-muted)]">
+      <nav className="mb-3 text-sm text-[var(--ink-muted)] sm:mb-4">
         <Link href="/" className="hover:text-[var(--navy)]">
           Home
         </Link>
@@ -70,27 +68,30 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <span className="text-[var(--navy)]">{category.title}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[200px_1fr] lg:items-start">
-        <Suspense fallback={null}>
-          <Filters categories={categories} brands={brands} activeCategory={slug} />
-        </Suspense>
+      <header className="mb-4 border-b border-[var(--line)] pb-4 sm:mb-6">
+        <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
+          {category.title}
+        </h1>
+        {category.description ? (
+          <p className="mt-2 max-w-2xl text-sm text-[var(--ink-muted)] sm:text-[15px]">
+            {category.description}
+          </p>
+        ) : null}
+        <p className="mt-1.5 text-sm font-medium text-[var(--ink-muted)]">
+          {products.length} part{products.length === 1 ? "" : "s"}
+        </p>
+      </header>
 
-        <div>
-          <header className="mb-5 border-b border-[var(--line)] pb-4">
-            <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
-              {category.title}
-            </h1>
-            {category.description ? (
-              <p className="mt-2 max-w-2xl text-sm text-[var(--ink-muted)] sm:text-[15px]">
-                {category.description}
-              </p>
-            ) : null}
-            <p className="mt-2 text-sm font-medium text-[var(--ink-muted)]">
-              {products.length} part{products.length === 1 ? "" : "s"}
-            </p>
-          </header>
-          <ProductGrid products={products} />
-        </div>
+      <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-8">
+        <Suspense fallback={null}>
+          <CatalogControls
+            categories={categories}
+            brands={brands}
+            activeCategory={slug}
+            resultCount={products.length}
+          />
+        </Suspense>
+        <ProductGrid products={products} />
       </div>
     </div>
   );

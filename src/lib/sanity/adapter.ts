@@ -1,3 +1,4 @@
+import { applyProductQuery } from "@/lib/catalog/query";
 import type { CatalogAdapter, CatalogProduct } from "@/lib/catalog/types";
 import { sanityClient } from "./client";
 import {
@@ -44,48 +45,14 @@ function mapProduct(doc: SanityProduct | null): CatalogProduct | null {
   };
 }
 
-function filterLocal(
-  list: CatalogProduct[],
-  opts?: {
-    category?: string;
-    brand?: string;
-    duty?: string;
-    q?: string;
-    featured?: boolean;
-  },
-) {
-  let result = list;
-  if (opts?.category) {
-    result = result.filter((p) => p.categories.some((c) => c.slug === opts.category));
-  }
-  if (opts?.brand) {
-    result = result.filter((p) => p.brandSlug === opts.brand);
-  }
-  if (opts?.duty && opts.duty !== "all") {
-    result = result.filter((p) => p.duty === opts.duty || p.duty === "both");
-  }
-  if (opts?.featured) {
-    result = result.filter((p) => p.featured);
-  }
-  if (opts?.q) {
-    const q = opts.q.toLowerCase();
-    result = result.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.mpn?.toLowerCase().includes(q) ||
-        p.barcode?.includes(q),
-    );
-  }
-  return result;
-}
-
 export const sanityAdapter: CatalogAdapter = {
   async getProducts(opts) {
     if (!sanityClient) return [];
     const docs = await sanityClient.fetch<SanityProduct[]>(productsQuery);
-    return filterLocal(docs.map((d) => mapProduct(d)!).filter(Boolean), opts);
+    return applyProductQuery(
+      docs.map((d) => mapProduct(d)!).filter(Boolean),
+      opts,
+    );
   },
   async getProductBySlug(slug) {
     if (!sanityClient) return null;

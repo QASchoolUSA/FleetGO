@@ -4,6 +4,7 @@ import {
   products as sampleProducts,
   siteSettings as sampleSettings,
 } from "./sample-data";
+import { applyProductQuery, type ProductQueryOpts } from "./query";
 import type {
   CatalogAdapter,
   CatalogBrand,
@@ -14,47 +15,9 @@ import type {
 import { isSanityConfigured } from "@/lib/sanity/env";
 import { sanityAdapter } from "@/lib/sanity/adapter";
 
-function filterProducts(
-  list: CatalogProduct[],
-  opts?: {
-    category?: string;
-    brand?: string;
-    duty?: string;
-    q?: string;
-    featured?: boolean;
-  },
-): CatalogProduct[] {
-  let result = [...list];
-  if (opts?.category) {
-    result = result.filter((p) => p.categories.some((c) => c.slug === opts.category));
-  }
-  if (opts?.brand) {
-    result = result.filter((p) => p.brandSlug === opts.brand);
-  }
-  if (opts?.duty && opts.duty !== "all") {
-    result = result.filter((p) => p.duty === opts.duty || p.duty === "both");
-  }
-  if (opts?.featured) {
-    result = result.filter((p) => p.featured);
-  }
-  if (opts?.q) {
-    const q = opts.q.toLowerCase().trim();
-    result = result.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.mpn?.toLowerCase().includes(q) ||
-        p.barcode?.includes(q) ||
-        p.description.toLowerCase().includes(q),
-    );
-  }
-  return result;
-}
-
 const sampleAdapter: CatalogAdapter = {
-  async getProducts(opts) {
-    return filterProducts(sampleProducts, opts);
+  async getProducts(opts?: ProductQueryOpts) {
+    return applyProductQuery(sampleProducts, opts);
   },
   async getProductBySlug(slug) {
     return sampleProducts.find((p) => p.slug === slug) ?? null;

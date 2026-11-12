@@ -93,6 +93,16 @@ function parseFullSync(body: Record<string, unknown>): InventorySyncPayload | { 
         }))
     : undefined;
 
+  const specs = Array.isArray(body.specs)
+    ? body.specs
+        .filter((row): row is Record<string, unknown> => !!row && typeof row === "object")
+        .map((row) => ({
+          label: asString(row.label) ?? "",
+          value: asString(row.value) ?? "",
+        }))
+        .filter((row) => row.label && row.value)
+    : undefined;
+
   return {
     title,
     brand: asString(body.brand),
@@ -110,6 +120,7 @@ function parseFullSync(body: Record<string, unknown>): InventorySyncPayload | { 
     contentHash,
     imageSource: asString(body.imageSource),
     fitment,
+    specs,
     autoPublish: body.autoPublish === false ? false : process.env.AUTO_PUBLISH !== "false",
   };
 }

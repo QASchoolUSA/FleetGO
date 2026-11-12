@@ -129,6 +129,11 @@ export type FitmentRow = {
   notes?: string;
 };
 
+export type SpecRow = {
+  label: string;
+  value: string;
+};
+
 export type InventorySyncPayload = {
   title: string;
   brand?: string;
@@ -146,6 +151,7 @@ export type InventorySyncPayload = {
   contentHash: string;
   imageSource?: string;
   fitment?: FitmentRow[];
+  specs?: SpecRow[];
   autoPublish?: boolean;
 };
 
@@ -208,9 +214,18 @@ export async function syncInventoryProduct(payload: InventorySyncPayload) {
       engine: row.engine,
       notes: row.notes,
     })),
-    specs: payload.imageSource
-      ? [{ label: "Image source", value: payload.imageSource }]
-      : [],
+    specs: [
+      ...(payload.specs ?? [])
+        .filter((s) => s.label?.trim() && s.value?.trim())
+        .map((s, index) => ({
+          _key: `spec-${index}-${s.label.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)}`,
+          label: s.label.trim(),
+          value: s.value.trim(),
+        })),
+      ...(payload.imageSource
+        ? [{ _key: "spec-imagesource", label: "Image source", value: payload.imageSource }]
+        : []),
+    ],
     stockStatus: stockStatusFromQuantity(payload.quantity),
     quantity: payload.quantity,
     convexProductKey: payload.convexProductKey,

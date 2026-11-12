@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --navy: #0f1c2e;
-  --navy-deep: #0a1628;
-  --signal: #d62828;
-  --signal-dark: #b01f1f;
+  /* Old Glory–inspired industrial parts palette */
+  --navy: #0b1f3a;
+  --navy-deep: #061526;
+  --field: #002868;
+  --field-bright: #1e4d9c;
+  --signal: #bf0a30;
+  --signal-dark: #8f0824;
   --surface: #ffffff;
   --surface-muted: #f3f5f8;
   --ink: #121820;
@@ -17,6 +20,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-navy: var(--navy);
+  --color-field: var(--field);
+  --color-signal: var(--signal);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 }
@@ -42,7 +48,7 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--signal) 25%, white);
+  background: color-mix(in srgb, var(--field) 22%, white);
 }
 
 img {
@@ -57,6 +63,34 @@ textarea {
   font: inherit;
 }
 
+/* Thin red | white | blue accent — industrial, not literal flag */
+.stripe-patriotic {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--signal) 0%,
+    var(--signal) 33.33%,
+    var(--surface) 33.33%,
+    var(--surface) 66.66%,
+    var(--field) 66.66%,
+    var(--field) 100%
+  );
+}
+
+@keyframes stripe-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.stripe-patriotic-animate {
+  animation: stripe-fade-in 0.45s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -68,5 +102,10 @@ textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .stripe-patriotic-animate {
+    animation: none;
+    opacity: 1;
   }
 }

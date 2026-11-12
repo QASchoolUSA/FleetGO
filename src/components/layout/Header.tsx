@@ -45,7 +45,7 @@ export function Header() {
           scrolled ? "border-[var(--line)] bg-[var(--surface)]/95 shadow-sm backdrop-blur-md" : "border-transparent bg-[var(--surface)]",
         )}
       >
-        <div className="border-b border-[var(--line)] bg-[var(--navy)] text-[var(--surface)]">
+        <div className="bg-[var(--navy)] text-[var(--surface)]">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-xs sm:px-6">
             <p className="truncate tracking-wide">
               Same-day cut-off 3 PM CT · Free shipping over $99*
@@ -54,6 +54,7 @@ export function Header() {
               (800) 555-0188
             </a>
           </div>
+          <div className="stripe-patriotic stripe-patriotic-animate" aria-hidden />
         </div>
 
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
@@ -80,9 +81,9 @@ export function Header() {
             <button
               type="button"
               onClick={() => setFinderOpen(true)}
-              className="hidden items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2 text-left text-sm transition hover:border-[var(--navy)] lg:inline-flex"
+              className="hidden items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2 text-left text-sm transition hover:border-[var(--field)] lg:inline-flex"
             >
-              <Truck className="h-4 w-4 text-[var(--signal)]" />
+              <Truck className="h-4 w-4 text-[var(--field)]" />
               <span className="max-w-[180px] truncate">
                 {vehicle ? vehicleLabel(vehicle) : "Select your vehicle"}
               </span>
@@ -113,7 +114,7 @@ export function Header() {
           <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 sm:px-6">
             <Link
               href="/shop"
-              className="whitespace-nowrap px-3 py-2.5 text-sm font-semibold text-[var(--navy)] hover:text-[var(--signal)]"
+              className="whitespace-nowrap px-3 py-2.5 text-sm font-semibold text-[var(--navy)] hover:text-[var(--field)]"
             >
               Shop all
             </Link>
@@ -121,7 +122,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="whitespace-nowrap px-3 py-2.5 text-sm font-medium text-[var(--ink-muted)] hover:text-[var(--navy)]"
+                className="whitespace-nowrap px-3 py-2.5 text-sm font-medium text-[var(--ink-muted)] hover:text-[var(--field)]"
               >
                 {item.label}
               </Link>
@@ -156,7 +157,7 @@ export function Header() {
                 }}
                 className="mb-3 flex w-full items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-3 text-left text-sm"
               >
-                <Truck className="h-4 w-4 text-[var(--signal)]" />
+                <Truck className="h-4 w-4 text-[var(--field)]" />
                 {vehicle ? vehicleLabel(vehicle) : "Select your vehicle"}
               </button>
               <Link

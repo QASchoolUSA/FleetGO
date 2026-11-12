@@ -10,10 +10,11 @@ export function Hero() {
         className="absolute inset-0 bg-cover bg-[center_30%]"
         style={{
           backgroundImage:
-            "linear-gradient(105deg, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.75) 48%, rgba(10,22,40,0.4) 100%), url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=2000&q=80')",
+            "linear-gradient(105deg, rgba(6,21,38,0.94) 0%, rgba(11,31,58,0.78) 48%, rgba(0,40,104,0.45) 100%), url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=2000&q=80')",
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(220,38,38,0.2),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,40,104,0.35),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(191,10,48,0.16),transparent_50%)]" />
 
       <div className="relative mx-auto flex min-h-[68vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 md:min-h-[72vh] md:py-20">
         <motion.p
@@ -48,13 +49,13 @@ export function Hero() {
         >
           <Link
             href="/shop"
-            className="inline-flex h-12 items-center justify-center rounded-md bg-[var(--signal)] px-6 text-sm font-bold uppercase tracking-wide text-white"
+            className="inline-flex h-12 items-center justify-center rounded-md bg-[var(--signal)] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)]"
           >
             Shop parts
           </Link>
           <Link
             href="/c/semi-hd"
-            className="inline-flex h-12 items-center justify-center rounded-md border border-white/30 bg-white/5 px-6 text-sm font-bold uppercase tracking-wide text-white backdrop-blur hover:bg-white/10"
+            className="inline-flex h-12 items-center justify-center rounded-md border border-[var(--field-bright)]/60 bg-[var(--field)]/35 px-6 text-sm font-bold uppercase tracking-wide text-white backdrop-blur transition hover:border-[var(--field-bright)] hover:bg-[var(--field)]/55"
           >
             Semi / HD
           </Link>

@@ -15,7 +15,7 @@ export default async function OrderSuccessPage({ searchParams }: Props) {
   return (
     <div className="mx-auto max-w-xl px-4 py-16 text-center sm:px-6">
       <ClearCartOnSuccess />
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--signal)]">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--field)]">
         Thank you
       </p>
       <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
@@ -30,7 +30,7 @@ export default async function OrderSuccessPage({ searchParams }: Props) {
       ) : null}
       <Link
         href="/shop"
-        className="mt-8 inline-flex h-11 items-center rounded-md bg-[var(--navy)] px-5 text-sm font-semibold text-white"
+        className="mt-8 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]"
       >
         Keep shopping
       </Link>

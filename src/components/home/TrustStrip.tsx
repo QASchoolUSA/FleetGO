@@ -24,7 +24,7 @@ export function TrustStrip() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
         {items.map(({ icon: Icon, title, copy }) => (
           <div key={title} className="flex gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[var(--navy)] text-white">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[var(--field)] text-white">
               <Icon className="h-5 w-5" />
             </div>
             <div>

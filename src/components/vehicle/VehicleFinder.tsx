@@ -167,7 +167,7 @@ export function VehicleFinder({
                 type="button"
                 onClick={save}
                 disabled={!make || !model || !year}
-                className="h-11 flex-1 rounded-md bg-[var(--signal)] font-semibold text-white disabled:opacity-40"
+                className="h-11 flex-1 rounded-md bg-[var(--field)] font-semibold text-white transition hover:bg-[var(--field-bright)] disabled:opacity-40"
               >
                 Save vehicle
               </button>

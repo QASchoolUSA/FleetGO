@@ -128,7 +128,7 @@ function FilterPanel({
               className={cn(
                 "rounded-md border px-2 py-2.5 text-center text-xs font-semibold sm:text-sm",
                 duty === opt.value
-                  ? "border-[var(--navy)] bg-[var(--navy)] text-white"
+                  ? "border-[var(--field)] bg-[var(--field)] text-white"
                   : "border-[var(--line)] bg-white text-[var(--navy)]",
               )}
             >
@@ -157,7 +157,7 @@ function FilterPanel({
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium",
                 presetId === preset.id
-                  ? "border-[var(--navy)] bg-[var(--navy)] text-white"
+                  ? "border-[var(--field)] bg-[var(--field)] text-white"
                   : "border-[var(--line)] bg-white text-[var(--navy)]",
               )}
             >
@@ -174,7 +174,7 @@ function FilterPanel({
               placeholder="Min"
               value={minInput}
               onChange={(e) => setMinInput(e.target.value)}
-              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
+              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--field)]"
               aria-label="Minimum price"
             />
             <span className="shrink-0 text-xs text-[var(--ink-muted)]">to</span>
@@ -185,7 +185,7 @@ function FilterPanel({
               placeholder="Max"
               value={maxInput}
               onChange={(e) => setMaxInput(e.target.value)}
-              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--navy)]"
+              className="h-10 min-w-0 flex-1 rounded-md border border-[var(--line)] bg-white px-2.5 text-sm text-[var(--navy)] outline-none focus:border-[var(--field)]"
               aria-label="Maximum price"
             />
           </div>
@@ -212,7 +212,7 @@ function FilterPanel({
           className={cn(
             "mt-2 flex w-full items-center gap-2 rounded-md border px-3 py-2.5 text-left text-sm",
             inStock
-              ? "border-[var(--navy)] bg-[var(--navy)] text-white"
+              ? "border-[var(--field)] bg-[var(--field)] text-white"
               : "border-[var(--line)] bg-white text-[var(--navy)]",
           )}
         >
@@ -347,7 +347,7 @@ export function CatalogControls({
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {activeCount > 0 ? (
-              <span className="rounded-full bg-[var(--signal)] px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded-full bg-[var(--field)] px-1.5 py-0.5 text-[10px] font-bold text-white">
                 {activeCount}
               </span>
             ) : null}
@@ -378,7 +378,7 @@ export function CatalogControls({
             <select
               value={sort}
               onChange={(e) => pushParams({ sort: e.target.value })}
-              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 text-sm font-semibold text-[var(--navy)] outline-none focus:border-[var(--navy)]"
+              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 text-sm font-semibold text-[var(--navy)] outline-none focus:border-[var(--field)]"
               aria-label="Sort products"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -397,7 +397,7 @@ export function CatalogControls({
                 <button
                   type="button"
                   onClick={() => clearFilters()}
-                  className="text-xs font-semibold text-[var(--signal)] hover:underline"
+                  className="text-xs font-semibold text-[var(--field)] hover:underline"
                 >
                   Clear
                 </button>
@@ -474,7 +474,7 @@ export function CatalogControls({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="h-11 flex-[1.4] rounded-md bg-[var(--signal)] text-sm font-bold uppercase tracking-wide text-white"
+                  className="h-11 flex-[1.4] rounded-md bg-[var(--signal)] text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)]"
                 >
                   Show {resultCount} results
                 </button>

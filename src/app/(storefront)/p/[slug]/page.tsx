@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: Props) {
         <ProductGallery images={product.images} title={product.title} />
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-            <Link href={`/brands/${product.brandSlug}`} className="hover:text-[var(--signal)]">
+            <Link href={`/brands/${product.brandSlug}`} className="hover:text-[var(--field)]">
               {product.brand}
             </Link>
           </p>

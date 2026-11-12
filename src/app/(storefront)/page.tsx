@@ -33,7 +33,7 @@ export default async function HomePage() {
               High-turn SKUs for light-duty and Class 8 maintenance.
             </p>
           </div>
-          <Link href="/shop" className="hidden text-sm font-semibold text-[var(--signal)] hover:underline sm:inline">
+          <Link href="/shop" className="hidden text-sm font-semibold text-[var(--field)] hover:underline sm:inline">
             View all
           </Link>
         </div>

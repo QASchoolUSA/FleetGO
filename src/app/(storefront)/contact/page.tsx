@@ -19,7 +19,7 @@ export default function ContactPage() {
         <div>
           <dt className="font-semibold text-[var(--navy)]">Phone</dt>
           <dd>
-            <a href="tel:18005550188" className="text-[var(--signal)] hover:underline">
+            <a href="tel:18005550188" className="text-[var(--field)] hover:underline">
               (800) 555-0188
             </a>
           </dd>
@@ -27,7 +27,7 @@ export default function ContactPage() {
         <div>
           <dt className="font-semibold text-[var(--navy)]">Email</dt>
           <dd>
-            <a href="mailto:parts@fleetgo.com" className="text-[var(--signal)] hover:underline">
+            <a href="mailto:parts@fleetgo.com" className="text-[var(--field)] hover:underline">
               parts@fleetgo.com
             </a>
           </dd>

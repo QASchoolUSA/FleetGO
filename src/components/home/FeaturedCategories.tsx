@@ -29,7 +29,7 @@ export function FeaturedCategories({ categories }: { categories: CatalogCategory
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
             ) : (
-              <div className="absolute inset-0 bg-[var(--navy)]" />
+              <div className="absolute inset-0 bg-[var(--field)]" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
             <span className="absolute bottom-3 left-3 right-3 font-[family-name:var(--font-display)] text-lg font-bold uppercase tracking-wide text-white sm:text-xl">

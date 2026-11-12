@@ -40,7 +40,7 @@ export function AddToCart({ product }: { product: CatalogProduct }) {
             qty,
           )
         }
-        className="h-12 flex-1 rounded-md bg-[var(--signal)] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-xs"
+        className="h-12 flex-1 rounded-md bg-[var(--signal)] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-xs"
       >
         {disabled ? "Unavailable" : "Add to cart"}
       </button>

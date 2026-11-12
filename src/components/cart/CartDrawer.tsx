@@ -51,7 +51,7 @@ export function CartDrawer() {
                   <Link
                     href="/shop"
                     onClick={closeCart}
-                    className="rounded-md bg-[var(--navy)] px-4 py-2 text-sm font-semibold text-white"
+                    className="rounded-md bg-[var(--field)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]"
                   >
                     Browse parts
                   </Link>
@@ -95,7 +95,7 @@ export function CartDrawer() {
                           </button>
                           <button
                             type="button"
-                            className="ml-auto text-xs font-medium text-[var(--signal)] hover:underline"
+                            className="ml-auto text-xs font-medium text-[var(--field)] hover:underline"
                             onClick={() => removeItem(item.productId)}
                           >
                             Remove
@@ -124,7 +124,7 @@ export function CartDrawer() {
                 <Link
                   href="/checkout"
                   onClick={closeCart}
-                  className="flex h-11 items-center justify-center rounded-md bg-[var(--signal)] font-semibold text-white"
+                  className="flex h-11 items-center justify-center rounded-md bg-[var(--signal)] font-semibold text-white transition hover:bg-[var(--signal-dark)]"
                 >
                   Checkout
                 </Link>

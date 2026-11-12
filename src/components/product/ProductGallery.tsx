@@ -48,7 +48,7 @@ export function ProductGallery({
               onClick={() => setActive(index)}
               className={cn(
                 "relative h-16 w-16 shrink-0 overflow-hidden rounded-md border",
-                index === active ? "border-[var(--navy)]" : "border-[var(--line)]",
+                index === active ? "border-[var(--field)]" : "border-[var(--line)]",
               )}
             >
               <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />

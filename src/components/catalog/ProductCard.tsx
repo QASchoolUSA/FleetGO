@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           />
         ) : null}
         {fits && (
-          <span className="absolute left-2 top-2 rounded bg-[var(--navy)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+          <span className="absolute left-2 top-2 rounded bg-[var(--field)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
             Fits your vehicle
           </span>
         )}

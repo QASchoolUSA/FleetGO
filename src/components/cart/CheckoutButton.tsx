@@ -56,7 +56,7 @@ export function CheckoutButton() {
         type="button"
         onClick={startCheckout}
         disabled={loading}
-        className="flex h-12 w-full items-center justify-center rounded-md bg-[var(--signal)] font-bold uppercase tracking-wide text-white disabled:opacity-60"
+        className="flex h-12 w-full items-center justify-center rounded-md bg-[var(--signal)] font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)] disabled:opacity-60"
       >
         {loading ? "Redirecting to Stripe…" : "Pay with Stripe"}
       </button>

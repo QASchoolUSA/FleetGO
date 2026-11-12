@@ -15,7 +15,7 @@ export function CartView() {
     return (
       <div className="rounded-lg border border-dashed border-[var(--line)] px-6 py-16 text-center">
         <p className="font-semibold text-[var(--navy)]">Your cart is empty</p>
-        <Link href="/shop" className="mt-4 inline-flex h-11 items-center rounded-md bg-[var(--navy)] px-5 text-sm font-semibold text-white">
+        <Link href="/shop" className="mt-4 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]">
           Continue shopping
         </Link>
       </div>
@@ -49,7 +49,7 @@ export function CartView() {
                 <button
                   type="button"
                   onClick={() => removeItem(item.productId)}
-                  className="text-sm font-medium text-[var(--signal)] hover:underline"
+                  className="text-sm font-medium text-[var(--field)] hover:underline"
                 >
                   Remove
                 </button>
@@ -68,7 +68,7 @@ export function CartView() {
         </p>
         <Link
           href="/checkout"
-          className="mt-5 flex h-12 items-center justify-center rounded-md bg-[var(--signal)] font-bold uppercase tracking-wide text-white"
+          className="mt-5 flex h-12 items-center justify-center rounded-md bg-[var(--signal)] font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)]"
         >
           Checkout
         </Link>

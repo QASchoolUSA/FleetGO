@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Old Glory–inspired industrial parts palette */
+  /* Apollo Creed trunks–matched (star panel + stripe); navy stays chrome */
   --navy: #0b1f3a;
   --navy-deep: #061526;
-  --field: #002868;
-  --field-bright: #1e4d9c;
-  --signal: #bf0a30;
-  --signal-dark: #8f0824;
+  --field: #1b54d4;
+  --field-bright: #4b7ef0;
+  --signal: #d8212a;
+  --signal-dark: #a81822;
   --surface: #ffffff;
   --surface-muted: #f3f5f8;
   --ink: #121820;

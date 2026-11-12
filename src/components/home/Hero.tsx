@@ -10,11 +10,11 @@ export function Hero() {
         className="absolute inset-0 bg-cover bg-[center_30%]"
         style={{
           backgroundImage:
-            "linear-gradient(105deg, rgba(6,21,38,0.94) 0%, rgba(11,31,58,0.78) 48%, rgba(0,40,104,0.45) 100%), url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=2000&q=80')",
+            "linear-gradient(105deg, rgba(6,21,38,0.94) 0%, rgba(11,31,58,0.78) 48%, rgba(27,84,212,0.42) 100%), url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=2000&q=80')",
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,40,104,0.35),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(191,10,48,0.16),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(27,84,212,0.35),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(216,33,42,0.16),transparent_50%)]" />
 
       <div className="relative mx-auto flex min-h-[68vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 md:min-h-[72vh] md:py-20">
         <motion.p

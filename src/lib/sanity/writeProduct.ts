@@ -120,6 +120,15 @@ export async function uploadImagesFromUrls(
   return images;
 }
 
+export type FitmentRow = {
+  yearFrom?: number;
+  yearTo?: number;
+  make?: string;
+  model?: string;
+  engine?: string;
+  notes?: string;
+};
+
 export type InventorySyncPayload = {
   title: string;
   brand?: string;
@@ -136,6 +145,7 @@ export type InventorySyncPayload = {
   convexProductKey: string;
   contentHash: string;
   imageSource?: string;
+  fitment?: FitmentRow[];
   autoPublish?: boolean;
 };
 
@@ -189,7 +199,15 @@ export async function syncInventoryProduct(payload: InventorySyncPayload) {
     categories: categoryId
       ? [{ _type: "reference" as const, _ref: categoryId, _key: categoryId }]
       : [],
-    fitment: [],
+    fitment: (payload.fitment ?? []).map((row, index) => ({
+      _key: `fitment-${index}`,
+      yearFrom: row.yearFrom,
+      yearTo: row.yearTo,
+      make: row.make,
+      model: row.model,
+      engine: row.engine,
+      notes: row.notes,
+    })),
     specs: payload.imageSource
       ? [{ label: "Image source", value: payload.imageSource }]
       : [],

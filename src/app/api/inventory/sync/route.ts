@@ -80,6 +80,19 @@ function parseFullSync(body: Record<string, unknown>): InventorySyncPayload | { 
   if (price === undefined || price < 0) return { error: "price must be a non-negative number" };
   if (imageUrls.length === 0) return { error: "imageUrls must include at least one URL" };
 
+  const fitment = Array.isArray(body.fitment)
+    ? body.fitment
+        .filter((row): row is Record<string, unknown> => !!row && typeof row === "object")
+        .map((row) => ({
+          yearFrom: asNumber(row.yearFrom),
+          yearTo: asNumber(row.yearTo),
+          make: asString(row.make),
+          model: asString(row.model),
+          engine: asString(row.engine),
+          notes: asString(row.notes),
+        }))
+    : undefined;
+
   return {
     title,
     brand: asString(body.brand),
@@ -96,6 +109,7 @@ function parseFullSync(body: Record<string, unknown>): InventorySyncPayload | { 
     convexProductKey,
     contentHash,
     imageSource: asString(body.imageSource),
+    fitment,
     autoPublish: body.autoPublish === false ? false : process.env.AUTO_PUBLISH !== "false",
   };
 }

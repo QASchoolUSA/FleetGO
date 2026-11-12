@@ -2,8 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="mt-auto bg-[var(--navy)] text-white">
-      <div className="stripe-patriotic" aria-hidden />
+    <footer className="mt-auto bg-[var(--field)] text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-1">
           <p className="font-[family-name:var(--font-display)] text-2xl font-bold uppercase tracking-[0.04em]">

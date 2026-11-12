@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Auto and semi truck parts ecommerce",
     start_url: "/",
     display: "standalone",
-    background_color: "#0B1F3A",
-    theme_color: "#0B1F3A",
+    background_color: "#1B54D4",
+    theme_color: "#1B54D4",
     icons: [
       {
         src: "/favicon.ico",

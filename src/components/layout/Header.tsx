@@ -45,7 +45,7 @@ export function Header() {
           scrolled ? "border-[var(--line)] bg-[var(--surface)]/95 shadow-sm backdrop-blur-md" : "border-transparent bg-[var(--surface)]",
         )}
       >
-        <div className="bg-[var(--navy)] text-[var(--surface)]">
+        <div className="bg-[var(--field)] text-[var(--surface)]">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-xs sm:px-6">
             <p className="truncate tracking-wide">
               Same-day cut-off 3 PM CT · Free shipping over $99*
@@ -54,13 +54,12 @@ export function Header() {
               (800) 555-0188
             </a>
           </div>
-          <div className="stripe-patriotic stripe-patriotic-animate" aria-hidden />
         </div>
 
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--line)] lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--line)] text-[var(--field)] lg:hidden"
             aria-label="Open menu"
             onClick={() => setMobileOpen(true)}
           >
@@ -68,7 +67,7 @@ export function Header() {
           </button>
 
           <Link href="/" className="shrink-0">
-            <span className="font-[family-name:var(--font-display)] text-2xl font-bold uppercase tracking-[0.04em] text-[var(--navy)] sm:text-3xl">
+            <span className="font-[family-name:var(--font-display)] text-2xl font-bold uppercase tracking-[0.04em] text-[var(--field)] sm:text-3xl">
               Fleet<span className="text-[var(--signal)]">Go</span>
             </span>
           </Link>
@@ -81,7 +80,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setFinderOpen(true)}
-              className="hidden items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2 text-left text-sm transition hover:border-[var(--field)] lg:inline-flex"
+              className="hidden items-center gap-2 rounded-md border border-[var(--field)]/25 bg-[var(--surface-muted)] px-3 py-2 text-left text-sm text-[var(--field)] transition hover:border-[var(--field)] hover:bg-[var(--field)]/5 lg:inline-flex"
             >
               <Truck className="h-4 w-4 text-[var(--field)]" />
               <span className="max-w-[180px] truncate">
@@ -92,7 +91,7 @@ export function Header() {
             <button
               type="button"
               onClick={openCart}
-              className="relative inline-flex h-10 items-center gap-2 rounded-md bg-[var(--navy)] px-3 text-sm font-semibold text-white"
+              className="relative inline-flex h-10 items-center gap-2 rounded-md bg-[var(--field)] px-3 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]"
               aria-label="Open cart"
             >
               <ShoppingCart className="h-4 w-4" />
@@ -114,7 +113,7 @@ export function Header() {
           <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 sm:px-6">
             <Link
               href="/shop"
-              className="whitespace-nowrap px-3 py-2.5 text-sm font-semibold text-[var(--navy)] hover:text-[var(--field)]"
+              className="whitespace-nowrap px-3 py-2.5 text-sm font-semibold text-[var(--field)] hover:text-[var(--field-bright)]"
             >
               Shop all
             </Link>
@@ -141,7 +140,7 @@ export function Header() {
           />
           <div className="absolute inset-y-0 left-0 flex w-[86%] max-w-sm flex-col bg-[var(--surface)] shadow-xl">
             <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3">
-              <span className="font-[family-name:var(--font-display)] text-xl font-bold uppercase text-[var(--navy)]">
+              <span className="font-[family-name:var(--font-display)] text-xl font-bold uppercase text-[var(--field)]">
                 Fleet<span className="text-[var(--signal)]">Go</span>
               </span>
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close">
@@ -195,7 +194,7 @@ export function Header() {
       <button
         type="button"
         onClick={() => setFinderOpen(true)}
-        className="fixed bottom-20 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[var(--navy)] px-4 py-3 text-sm font-semibold text-white shadow-lg lg:hidden"
+        className="fixed bottom-20 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[var(--field)] px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[var(--field-bright)] lg:hidden"
       >
         <Truck className="h-4 w-4" />
         Vehicle

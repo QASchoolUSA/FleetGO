@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  /* Apollo Creed trunks–matched (star panel + stripe); navy stays chrome */
-  --navy: #0b1f3a;
-  --navy-deep: #061526;
+  /* Triad: white + Apollo field blue + trunk scarlet (navy = deeper blue shade) */
   --field: #1b54d4;
   --field-bright: #4b7ef0;
+  --navy: #1342a8;
+  --navy-deep: #0e2f7a;
   --signal: #d8212a;
   --signal-dark: #a81822;
   --surface: #ffffff;
@@ -63,34 +63,6 @@ textarea {
   font: inherit;
 }
 
-/* Thin red | white | blue accent — industrial, not literal flag */
-.stripe-patriotic {
-  height: 3px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--signal) 0%,
-    var(--signal) 33.33%,
-    var(--surface) 33.33%,
-    var(--surface) 66.66%,
-    var(--field) 66.66%,
-    var(--field) 100%
-  );
-}
-
-@keyframes stripe-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.stripe-patriotic-animate {
-  animation: stripe-fade-in 0.45s ease-out both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -102,10 +74,5 @@ textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-
-  .stripe-patriotic-animate {
-    animation: none;
-    opacity: 1;
   }
 }

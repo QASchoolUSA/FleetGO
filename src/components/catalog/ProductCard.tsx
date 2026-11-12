@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   const image = product.images[0];
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-[var(--line)] bg-white transition hover:border-[var(--navy)]/30 hover:shadow-[0_10px_24px_rgba(15,28,46,0.08)]">
+    <article className="group overflow-hidden rounded-lg border border-[var(--line)] bg-white transition hover:border-[var(--field)]/35 hover:shadow-[0_10px_24px_rgba(27,84,212,0.12)]">
       <Link
         href={`/p/${product.slug}`}
         className="relative block aspect-[5/4] overflow-hidden bg-[var(--surface-muted)]"

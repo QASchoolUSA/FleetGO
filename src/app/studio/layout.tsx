@@ -5,6 +5,8 @@ export const metadata = {
 
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white text-black [color-scheme:light]">{children}</div>
+    <div className="min-h-screen bg-[var(--surface)] text-[var(--ink)] [color-scheme:light]">
+      {children}
+    </div>
   );
 }

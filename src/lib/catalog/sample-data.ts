@@ -100,8 +100,9 @@ export const products: CatalogProduct[] = [
     title: "Ceramic Brake Pad Set — Front",
     slug: "ceramic-brake-pad-set-front",
     description:
-      "Low-dust ceramic compound engineered for quiet stops and consistent pedal feel. Includes hardware kit and wear sensors where applicable.",
-    shortDescription: "Quiet ceramic pads with hardware included.",
+      "RoadGuard ceramic brake pads for the front axle deliver quiet, low-dust stopping power for half-ton pickups that tow, commute, and work every day. The ceramic friction mix holds a consistent pedal through heat cycles, cutting the squeal and rotor glazing you get from cheap semi-mets. Hardware kit and wear sensors are included where the application calls for them, so you are not hunting clips on the floor. Confirm fitment for 2015–2023 Ford F-150 3.5L EcoBoost and 2016–2022 Chevrolet Silverado 1500 5.3L before ordering. Replace pads when thickness is near the wear indicator or after scoring the rotors—pair with a vented front rotor for a complete job. Shop SKU FG-BP-CER-F / MPN RGP-4500 when you need ceramic brake pads that feel OE-solid without dealer markup.",
+    shortDescription:
+      "RoadGuard front ceramic brake pads with hardware for quiet, low-dust stops on F-150 and Silverado 1500. SKU FG-BP-CER-F.",
     price: 64.99,
     compareAtPrice: 79.99,
     currency: "USD",
@@ -131,8 +132,9 @@ export const products: CatalogProduct[] = [
     title: "HD Air Disc Brake Pad — Steer",
     slug: "hd-air-disc-brake-pad-steer",
     description:
-      "Class 8 air disc pads formulated for long haul duty cycles. Stable friction across temperature ranges with anti-noise shims.",
-    shortDescription: "Class 8 air disc pads for steer axle.",
+      "HaulMax HD air disc brake pads for the steer axle are built for Class 8 linehaul and regional duty where fade resistance matters more than a bargain friction mix. Stable mu across temperature swings keeps pedal feel predictable on Cascadia and T680 air disc steer setups, while anti-noise shims help control chatter on long grades. Specs call out steer axle, air disc system, Class 8 duty—order by application, not guesswork. Fitment covers 2018–2025 Freightliner Cascadia and 2019–2025 Kenworth T680 air disc steer. Swap pads when lining is at wear limit or after scoring rotors; always service both sides of the axle. Search SKU HM-ADB-STEER / MPN HM-ADBS-12 for steer air disc pads that belong on a working tractor.",
+    shortDescription:
+      "HaulMax Class 8 air disc brake pads for the steer axle with stable friction on Cascadia and T680. Direct-fit when the application SKU HM-ADB-STEER.",
     price: 189.0,
     currency: "USD",
     sku: "HM-ADB-STEER",
@@ -164,8 +166,9 @@ export const products: CatalogProduct[] = [
     title: "Premium Oil Filter — Extended Life",
     slug: "premium-oil-filter-extended-life",
     description:
-      "High-capacity media traps fine contaminants while maintaining flow. Ideal for extended drain intervals on gas and light diesel trucks.",
-    shortDescription: "Extended-life oil filtration for pickups.",
+      "Filterite premium oil filter — extended life is built for gas and light-duty trucks running longer drain intervals without starving the oil pump. High-capacity media traps fine contaminants while the bypass valve (22 psi) and M22 x 1.5 thread keep flow and sealing in OE range. Ideal for shops and fleets standardizing spin-on filters across Ram 1500 5.7L HEMI (2011–2024) and Ford F-150 5.0L (2015–2023). Change the filter every oil service; do not reuse crush gaskets. If you search extended-life oil filter, pickup oil filter, or SKU FT-OF-XL / MPN FT-5718, this is the counter-ready answer for clean oil and fewer early engine wear calls.",
+    shortDescription:
+      "Filterite extended-life oil filter for pickups with high-capacity media, M22x1.5 thread, and 22 psi bypass. SKU FT-OF-XL.",
     price: 14.49,
     currency: "USD",
     sku: "FT-OF-XL",
@@ -193,8 +196,9 @@ export const products: CatalogProduct[] = [
     title: "HD Fuel Filter / Water Separator",
     slug: "hd-fuel-filter-water-separator",
     description:
-      "Dual-stage fuel filtration with water drain for Cummins and Detroit platforms. Protects injectors from water and particulates.",
-    shortDescription: "Dual-stage HD fuel / water separator.",
+      "HaulMax HD fuel filter / water separator protects high-pressure injectors on modern Class 8 diesels with dual-stage filtration and a manual water drain. Seven-micron media catches particulates and emulsified water before they score pumps and tips—critical on X15 and A26 platforms. Fitment includes 2017–2025 Peterbilt 579 with X15 and 2016–2024 International LT with A26; verify mounting and water-in-fuel sensor interface before install. Drain the bowl on PM and replace the element at OEM fuel-filter intervals or sooner in wet climates. Order SKU HM-FF-WS / MPN HM-FS1000 when you need a diesel fuel filter water separator that belongs on a working tractor, not a shelf queen.",
+    shortDescription:
+      "HaulMax dual-stage HD fuel filter / water separator with 7-micron media and manual drain for Class 8. Direct-fit when the application SKU HM-FF-WS.",
     price: 54.95,
     currency: "USD",
     sku: "HM-FF-WS",
@@ -224,8 +228,9 @@ export const products: CatalogProduct[] = [
     title: "LED Projector Headlight Assembly — Pair",
     slug: "led-projector-headlight-assembly-pair",
     description:
-      "DOT-compliant LED projectors with DRL signature and plug-and-play harness. Bright white output with sealed housing.",
-    shortDescription: "DOT LED headlights with DRL.",
+      "ClearBeam LED projector headlight assemblies (pair) bring DOT/SAE-compliant 6000K white output and a DRL signature to 2014–2018 Chevrolet Silverado 1500 and GMC Sierra 1500 without cutting harnesses. Plug-and-play connectors and sealed projector housings resist condensation that kills cheap sealed beams. Designed as a complete left/right pair so beam aim and styling stay matched. Aim headlights after install and confirm turn/DRL circuits before releasing the truck. Replace cloudy OE projectors or failed HID ballasts with SKU CB-HL-LED-PR / MPN CB-HL900 when you need LED headlights that pass inspection and light the shoulder on night runs.",
+    shortDescription:
+      "ClearBeam DOT/SAE LED projector headlight pair with DRL for 2014-2018 Silverado and Sierra 1500. Direct-fit when the application matches. SKU CB-HL-LED-PR.",
     price: 329.0,
     compareAtPrice: 399.0,
     currency: "USD",
@@ -254,8 +259,9 @@ export const products: CatalogProduct[] = [
     title: "Oval LED Marker Lamp — Amber",
     slug: "oval-led-marker-lamp-amber",
     description:
-      "Sealed oval marker with polycarbonate lens. Surface mount for trailers and cab corners. Sold individually.",
-    shortDescription: "Sealed amber oval LED marker.",
+      "ClearBeam oval LED marker lamp in amber is a sealed, surface-mount unit for trailer sides, cab corners, and clearance positions on mixed fleets. Polycarbonate lens and 12/24V compatibility cover light-duty and Class 8 marker circuits without a separate ballast. Sold individually so you can replace one failed lamp without buying a six-pack you do not need. Universal fitment for trailer and cab applications from 2000 forward—verify grommet size and pigtail before mount. Swap markers when the lens is cracked, water-logged, or LEDs are out. SKU CB-MK-OVL-A / MPN CB-M6A is the amber oval LED marker lamp counters stock for DOT visibility repairs.",
+    shortDescription:
+      "ClearBeam sealed amber oval LED marker lamp with 12/24V surface mount for trailers and cab corners. Direct-fit when the application SKU CB-MK-OVL-A.",
     price: 12.99,
     currency: "USD",
     sku: "CB-MK-OVL-A",
@@ -282,8 +288,9 @@ export const products: CatalogProduct[] = [
     title: "AGM Dual-Purpose Battery Group 31",
     slug: "agm-dual-purpose-battery-group-31",
     description:
-      "Spill-proof AGM battery for deep-cycle and cranking demands. Vibration resistant for vocational and over-the-road trucks.",
-    shortDescription: "Group 31 AGM dual-purpose battery.",
+      "VoltEdge Group 31 AGM dual-purpose battery is built for trucks that need both strong cranking and deep-cycle reserve—APUs, reefers, and high electrical loads on Freightliner Cascadia and Volvo VNL platforms. Spill-proof AGM construction resists vibration and can mount in more orientations than flooded Group 31s. Rated 950 CCA for cold starts on Class 8 diesels. Fitment spans 2010–2025 Cascadia and 2012–2025 VNL; confirm hold-down and terminal layout. Test and replace when CCA drops or when parasitic drain kills flooded packs overnight. Order SKU VE-BAT-G31 / MPN VE-G31DP for a Group 31 AGM battery that belongs in a working tractor battery box.",
+    shortDescription:
+      "VoltEdge Group 31 AGM dual-purpose battery, 950 CCA, spill-proof for Cascadia and VNL cranking loads. Direct-fit when the application SKU VE-BAT-G31.",
     price: 249.99,
     currency: "USD",
     sku: "VE-BAT-G31",
@@ -315,8 +322,9 @@ export const products: CatalogProduct[] = [
     title: "High-Output Alternator 220A",
     slug: "high-output-alternator-220a",
     description:
-      "Remanufactured high-output alternator with new regulator and bearings. Supports winches, lighting, and auxiliary loads.",
-    shortDescription: "220A reman high-output alternator.",
+      "VoltEdge 220A remanufactured high-output alternator replaces underbuilt OE units on Super Duty and Ram HD diesels carrying winches, light bars, and aux inverters. New regulator and bearings in the reman package restore charging capacity without a new-unit premium. Specs: 220 amps, reman condition. Fitment includes 2009–2014 Ford F-250 Super Duty 6.7L and 2011–2016 Ram 2500 6.7L Cummins—verify pulley, clocking, and plug before install. Replace when voltage sags under load or bearings howl. Search high-output alternator 220A or SKU VE-ALT-220 / MPN VE-A220R when the stock amp rating cannot keep up with the electrical load sheet.",
+    shortDescription:
+      "VoltEdge remanufactured 220A high-output alternator for Super Duty and Ram HD auxiliary electrical loads. SKU VE-ALT-220.",
     price: 189.5,
     currency: "USD",
     sku: "VE-ALT-220",
@@ -343,8 +351,9 @@ export const products: CatalogProduct[] = [
     title: "Serpentine Belt — Multi-Rib",
     slug: "serpentine-belt-multi-rib",
     description:
-      "EPDM multi-rib belt resists cracking and stretch. Precision length for OE routing on common light truck platforms.",
-    shortDescription: "Durable EPDM serpentine belt.",
+      "FleetPro multi-rib serpentine belt uses EPDM rubber that resists cracking, glazing, and stretch better than older neoprene belts on light trucks. Six-rib, 895 mm precision length matches OE routing so tensioners and pulleys stay in design geometry. Fitment covers 2018–2024 Toyota Tacoma 3.5L and 2016–2022 Honda Ridgeline 3.5L—confirm rib count and length against the old belt before install. Replace at the first sign of rib cracks, chirp after rain, or when the tensioner is serviced. SKU FP-SB-MR / MPN FP-K060895 is the serpentine belt to stock when you need a durable EPDM drive belt without hunting three part numbers.",
+    shortDescription:
+      "FleetPro 6-rib EPDM serpentine belt, 895 mm precision length for Tacoma and Ridgeline OE belt routing. Direct-fit when the application SKU FP-SB-MR.",
     price: 28.75,
     currency: "USD",
     sku: "FP-SB-MR",
@@ -371,8 +380,9 @@ export const products: CatalogProduct[] = [
     title: "Coolant Thermostat Housing Kit",
     slug: "coolant-thermostat-housing-kit",
     description:
-      "Complete housing kit with thermostat, gasket, and sensor port. Addresses common coolant weep points on modern V6 trucks.",
-    shortDescription: "Housing + thermostat + gasket kit.",
+      "FleetPro coolant thermostat housing kit replaces the plastic housing, thermostat, and gasket that commonly weep on GM half-ton 5.3L trucks. Includes a 195°F thermostat and sensor port (sensor not included) so you can reseal the cooling circuit in one visit. Fitment for 2011–2017 Chevrolet Silverado 1500 and GMC Sierra 1500 5.3L—verify casting and sensor orientation. Replace when you see pink or orange crust at the housing, unexplained coolant loss, or a stuck-open thermostat code. Order SKU FP-TH-KIT / MPN FP-THK318 for a thermostat housing kit that fixes the leak path instead of only swapping the thermostat.",
+    shortDescription:
+      "FleetPro thermostat housing kit with 195F thermostat and gasket for 2011-2017 Silverado/Sierra 5.3L. Direct-fit when the application SKU FP-TH-KIT.",
     price: 74.0,
     currency: "USD",
     sku: "FP-TH-KIT",
@@ -399,8 +409,9 @@ export const products: CatalogProduct[] = [
     title: "Gas Shock Absorber — Rear",
     slug: "gas-shock-absorber-rear",
     description:
-      "Nitrogen-charged gas shock restores ride control and payload stability. Direct-fit eyelet mounts.",
-    shortDescription: "Nitrogen gas rear shock.",
+      "FleetPro gas shock absorber for the rear axle restores damping when OE shocks are leaked out and the truck floats over washboard. Nitrogen-charged gas design reduces fade and keeps payload from bouncing on GMT900 half-tons. Direct-fit eyelet mounts speed install—rear position, gas type. Fitment for 2007–2013 Chevrolet Silverado 1500 and GMC Sierra 1500. Replace shocks in pairs when the truck porpoises, tires cup, or oil is visible on the body. SKU FP-SHK-R / MPN FP-G64001 is the rear gas shock absorber to put under a working pickup without upgrading to a full coilover kit.",
+    shortDescription:
+      "FleetPro nitrogen-charged rear gas shock absorber for restored ride control on 2007-2013 GMT900 trucks. Direct-fit when the application SKU FP-SHK-R.",
     price: 49.99,
     currency: "USD",
     sku: "FP-SHK-R",
@@ -427,8 +438,9 @@ export const products: CatalogProduct[] = [
     title: "Air Ride Suspension Bag — Drive",
     slug: "air-ride-suspension-bag-drive",
     description:
-      "Heavy-duty rolling lobe air spring for drive axle. Reinforced bellows for vocational and linehaul applications.",
-    shortDescription: "HD air spring for drive axle.",
+      "HaulMax air ride suspension bag for the drive axle is a heavy-duty rolling lobe air spring for Class 8 linehaul and vocational tractors. Reinforced bellows handle repeated load cycles on Freightliner Cascadia and Kenworth T680 drive applications (2015–2025 / 2016–2025). Specs: rolling lobe style, drive axle. Inspect pistons and bump stops when replacing a ruptured bag; set ride height per OEM after install. Replace at the first dry rot crack, blister, or overnight pressure loss. Search air spring drive axle or SKU HM-AS-DRV / MPN HM-1R12-425 when you need an HD air ride bag that keeps the tractor level under load.",
+    shortDescription:
+      "HaulMax heavy-duty rolling lobe air spring for Class 8 drive-axle air ride on Cascadia and T680. Direct-fit when the application matches. SKU HM-AS-DRV.",
     price: 129.0,
     currency: "USD",
     sku: "HM-AS-DRV",
@@ -459,8 +471,9 @@ export const products: CatalogProduct[] = [
     title: "Air Dryer Cartridge",
     slug: "air-dryer-cartridge",
     description:
-      "Desiccant cartridge for spin-on air dryers. Removes moisture to protect valves and air brake plumbing.",
-    shortDescription: "Spin-on air dryer desiccant.",
+      "HaulMax air dryer cartridge is a spin-on desiccant element that pulls moisture out of the supply before it reaches valves, tanks, and gladhand lines. Wet air freezes relays and corrodes fittings—this cartridge is preventive maintenance for any tractor on a spin-on dryer. Universal fitment for spin-on dryer systems 2010–2025; match thread and canister height to the dryer head. Service on the OEM interval or sooner in humid and winter climates. When searching air dryer cartridge, spin-on desiccant, or SKU HM-AD-CART / MPN HM-AD-SPIN, this is the Class 8 PM part that keeps the air brake system dry.",
+    shortDescription:
+      "HaulMax spin-on air dryer desiccant cartridge that removes moisture to protect Class 8 air brake valves. SKU HM-AD-CART.",
     price: 68.5,
     currency: "USD",
     sku: "HM-AD-CART",
@@ -487,8 +500,9 @@ export const products: CatalogProduct[] = [
     title: "Fifth Wheel Grease — Extreme Pressure",
     slug: "fifth-wheel-grease-extreme-pressure",
     description:
-      "High-tack EP grease formulated for fifth-wheel plates. Resists wash-off and extreme pressure under loaded coupling.",
-    shortDescription: "EP fifth-wheel plate grease.",
+      "HaulMax fifth wheel grease — extreme pressure is a high-tack NLGI 2 EP grease packed for plate and locking jaw service on any fifth-wheel coupling. It resists water wash-off and stays put under loaded kingpin pressure so you are not greasing every stop. 35 oz pack covers routine plate service for linehaul and drop-and-hook fleets. Universal fifth-wheel fitment from 1990 forward. Clean old grease and inspect for gouges before applying a fresh film. Order SKU HM-FW-GRS / MPN HM-FWG35 when you need fifth-wheel plate grease that holds EP film where chassis grease washes away.",
+    shortDescription:
+      "HaulMax NLGI 2 EP fifth-wheel plate grease in a 35 oz pack with high-tack film under loaded kingpin duty. SKU HM-FW-GRS.",
     price: 18.99,
     currency: "USD",
     sku: "HM-FW-GRS",
@@ -515,8 +529,9 @@ export const products: CatalogProduct[] = [
     title: "Synthetic Blend 5W-30 Motor Oil — 5 qt",
     slug: "synthetic-blend-5w30-motor-oil-5qt",
     description:
-      "API SP / ILSAC GF-6 synthetic blend for gasoline engines. Balanced protection for daily driving and towing.",
-    shortDescription: "5W-30 synthetic blend, 5 quart jug.",
+      "FleetPro synthetic blend 5W-30 motor oil in a 5 quart jug covers many gasoline engines specifying API SP / ILSAC GF-6 viscosity for daily driving and light towing. Synthetic blend chemistry balances wear protection, deposit control, and cost for fleet oil changes that do not all need full synthetic. Use where the OE cap calls for 5W-30; universal listing for gas engines 2011–2025 that specify this grade. Always match viscosity and certification to the owner’s manual—do not use in diesels that require CJ-4/CK-4 grades. SKU FP-OIL-5W30 / MPN FP-5W30-5Q is the 5W-30 synthetic blend jug to put on the counter for quick LOFs.",
+    shortDescription:
+      "FleetPro API SP / ILSAC GF-6 synthetic blend 5W-30 motor oil in a 5 quart jug for gasoline engines. Direct-fit when the application SKU FP-OIL-5W30.",
     price: 24.99,
     currency: "USD",
     sku: "FP-OIL-5W30",
@@ -540,8 +555,9 @@ export const products: CatalogProduct[] = [
     title: "ELC Coolant Premix — Gallon",
     slug: "elc-coolant-premix-gallon",
     description:
-      "Extended-life coolant premix for diesel and gas. Protects against corrosion and freeze-up across mixed fleets.",
-    shortDescription: "ELC coolant premix, 1 gallon.",
+      "FleetPro ELC coolant premix (1 gallon) is ready-to-pour extended-life coolant for mixed diesel and gas fleets that standardize on ELC chemistry. Premix eliminates mixing errors that leave trucks under-protected against freeze and corrosion. Universal for ELC-compatible systems 2000–2025—do not mix with conventional green without a full flush. Top off or refill after hose, radiator, or thermostat jobs; follow OEM change intervals for ELC. Search ELC coolant premix or SKU FP-CL-ELC / MPN FP-ELC1G when you need gallon jugs that keep cooling systems protected without a drum room.",
+    shortDescription:
+      "FleetPro ELC coolant premix, 1 gallon ready-to-pour jug for freeze and corrosion protection on mixed fleets. SKU FP-CL-ELC.",
     price: 19.49,
     currency: "USD",
     sku: "FP-CL-ELC",
@@ -565,8 +581,9 @@ export const products: CatalogProduct[] = [
     title: "Beam Wiper Blade 22\"",
     slug: "beam-wiper-blade-22",
     description:
-      "Frameless beam blade with graphite-coated rubber for streak-free clears. Easy install adapter included.",
-    shortDescription: "22-inch beam wiper blade.",
+      "FleetPro 22-inch beam wiper blade uses a frameless beam design and graphite-coated rubber for even pressure and fewer streaks in rain and road spray. Adapter included for common light-truck arms. Fitment notes cover driver-side use on many 2015–2023 Ford F-150 trims and 2016–2022 Toyota Tacoma—verify arm style and length against the OE blade. Replace blades every 6–12 months or when they chatter and leave film. SKU FP-WIP-22 / MPN FP-B22 is the 22-inch beam wiper blade to stock for pickup visibility repairs.",
+    shortDescription:
+      "FleetPro 22-inch frameless beam wiper blade with graphite-coated rubber and an install adapter included. Direct-fit when the application SKU FP-WIP-22.",
     price: 16.99,
     currency: "USD",
     sku: "FP-WIP-22",
@@ -593,8 +610,9 @@ export const products: CatalogProduct[] = [
     title: "Cabin Air Filter — Carbon",
     slug: "cabin-air-filter-carbon",
     description:
-      "Activated carbon cabin filter reduces odors and fine dust. Direct-fit for popular half-ton pickups.",
-    shortDescription: "Carbon cabin air filter.",
+      "Filterite cabin air filter with activated carbon media cuts odors, exhaust smell, and fine dust before they hit the HVAC box on popular half-tons. Carbon media outperforms plain particulate filters when trucks idle in traffic or haul animals and gear. Direct-fit for 2015–2020 Ford F-150 and 2019–2024 Ram 1500—confirm glove-box or under-cowl access for your cab. Replace every 12–15k miles or when airflow drops and musty smell returns. SKU FT-CAF-C / MPN FT-CAF448 is the carbon cabin air filter to recommend at every cabin filter PM.",
+    shortDescription:
+      "Filterite activated carbon cabin air filter for F-150 and Ram 1500 that reduces odor and fine cabin dust. Direct-fit when the application SKU FT-CAF-C.",
     price: 21.5,
     currency: "USD",
     sku: "FT-CAF-C",
@@ -621,8 +639,9 @@ export const products: CatalogProduct[] = [
     title: "Wheel Speed Sensor — ABS",
     slug: "wheel-speed-sensor-abs",
     description:
-      "OE-style ABS wheel speed sensor with sealed connector. Restores ABS and traction control signals.",
-    shortDescription: "ABS wheel speed sensor.",
+      "RoadGuard ABS wheel speed sensor restores clean wheel-speed signal to the ABS and traction modules when the OE sensor is open, shorted, or damaged by debris. OE-style sealed connector resists corrosion in the knuckle area. Fitment for front left on 2014–2019 Chevrolet Silverado 1500 and GMC Sierra 1500—verify side and harness length. Clear ABS codes after install and road-test for proper tone-ring air gap. Replace when you have C0035-style codes, ABS light with one wheel offline, or a broken pigtail. SKU RG-ABS-WSS / MPN RG-WSS221 is the ABS wheel speed sensor for GMT K2XX brake electrical repairs.",
+    shortDescription:
+      "RoadGuard OE-style ABS wheel speed sensor with sealed connector for front-left K2XX Silverado and Sierra. SKU RG-ABS-WSS.",
     price: 39.95,
     currency: "USD",
     sku: "RG-ABS-WSS",
@@ -652,8 +671,9 @@ export const products: CatalogProduct[] = [
     title: "Gladhand Seal Kit — Red / Blue",
     slug: "gladhand-seal-kit-red-blue",
     description:
-      "Replacement rubber seals for emergency and service gladhands. Keep air lines sealing tight at the trailer connection.",
-    shortDescription: "Gladhand seal pair, red & blue.",
+      "HaulMax gladhand seal kit includes red (emergency) and blue (service) nitrile seals so both gladhands seal tight at the trailer connection. Soft, cracked, or missing seals leak supply and service air and fail pre-trip. Universal for trailer gladhands 1990–2025. Pop old seals, clean the face, and press in the new pair—keep a kit in every tractor toolbox. Replace whenever seals are flat-spotted, oil-swollen, or missing after a hard yank. SKU HM-GH-SEAL / MPN HM-GHS-RB is the red/blue gladhand seal kit fleets buy by the box.",
+    shortDescription:
+      "HaulMax gladhand seal kit with red emergency and blue service nitrile seals for trailer air connections. SKU HM-GH-SEAL.",
     price: 8.49,
     currency: "USD",
     sku: "HM-GH-SEAL",
@@ -677,8 +697,9 @@ export const products: CatalogProduct[] = [
     title: "LED Work Light 4\" Flood",
     slug: "led-work-light-4-flood",
     description:
-      "Rugged aluminum housing flood light for decks, dumps, and service bodies. IP67 sealed with Deutsch-style connector.",
-    shortDescription: "4-inch LED flood work light.",
+      "ClearBeam 4-inch LED work light (flood) puts about 1800 lumens on decks, dumps, and service bodies with a rugged aluminum housing and IP67 seal. Deutsch-style connector and 12/24V compatibility cover light-duty and Class 8 work trucks. Flood pattern lights a wide area for night loading—not a pencil spot for highway use. Universal fitment for 12/24V vehicles 2000–2025; mount on a solid bracket and fuse the circuit. Replace cracked lenses or water-failed lamps before they short the harness. SKU CB-WL-4F / MPN CB-WL4F is the LED flood work light shops mount on utility and dump bodies.",
+    shortDescription:
+      "ClearBeam 4-inch LED flood work light with about 1800 lumens, IP67 aluminum housing, and 12/24V input. Direct-fit when the application SKU CB-WL-4F.",
     price: 44.0,
     currency: "USD",
     sku: "CB-WL-4F",
@@ -702,8 +723,9 @@ export const products: CatalogProduct[] = [
     title: "Diesel Exhaust Fluid — 2.5 gal",
     slug: "diesel-exhaust-fluid-2-5-gal",
     description:
-      "API-certified DEF for SCR systems. Keep emissions systems running clean on modern diesels and Class 8 trucks.",
-    shortDescription: "API-certified DEF, 2.5 gallons.",
+      "FleetPro diesel exhaust fluid in a 2.5 gallon jug is API-certified DEF for SCR systems on modern light diesels and Class 8 trucks. Clean DEF keeps NOx conversion on target and avoids inducement derates from empty or contaminated tanks. Universal for SCR diesels 2010–2025—store sealed, out of direct sun, and never dilute. Top off when the DEF gauge warns; do not pour into the diesel fill. SKU FP-DEF-25 / MPN FP-DEF25 is the 2.5 gal DEF jug fleets grab between bulk fills.",
+    shortDescription:
+      "FleetPro API-certified diesel exhaust fluid (DEF) in a 2.5 gallon jug for SCR systems on modern diesels. Direct-fit when the application SKU FP-DEF-25.",
     price: 12.99,
     currency: "USD",
     sku: "FP-DEF-25",
@@ -727,8 +749,9 @@ export const products: CatalogProduct[] = [
     title: "Brake Rotor — Vented Front",
     slug: "brake-rotor-vented-front",
     description:
-      "Precision-machined vented rotor for even pad contact and heat dissipation. Coated hat to resist rust-through on the shelf.",
-    shortDescription: "Coated vented front brake rotor.",
+      "RoadGuard vented front brake rotor is precision-machined for even pad contact and heat dumping on half-ton pickups. Coated hat resists shelf rust so the mounting surface stays clean until install. Front position, vented style—pair with quality ceramic or semi-met pads and torque lug nuts to OE spec. Fitment for 2015–2020 Ford F-150 and 2019–2024 Ram 1500; always replace rotors in axle pairs when thickness is below discard or runout is out of spec. SKU RG-ROT-VF / MPN RG-R580 is the coated vented front brake rotor for F-150 and Ram 1500 brake jobs.",
+    shortDescription:
+      "RoadGuard coated vented front brake rotor for F-150 and Ram 1500, machined for heat and even pad contact. SKU RG-ROT-VF.",
     price: 72.0,
     currency: "USD",
     sku: "RG-ROT-VF",
@@ -755,8 +778,9 @@ export const products: CatalogProduct[] = [
     title: "Starter Motor — HD Gear Reduction",
     slug: "starter-motor-hd-gear-reduction",
     description:
-      "Gear-reduction starter delivers strong cranking torque for diesel platforms. New solenoid and brushes in reman unit.",
-    shortDescription: "HD gear-reduction reman starter.",
+      "VoltEdge HD gear-reduction starter motor is a reman unit with new solenoid and brushes for strong cranking torque on Class 8 diesels. Gear reduction multiplies torque so cold DD15 and ISX platforms turn over without dragging the battery pack down as hard as older direct-drive starters. Fitment includes 2008–2018 Freightliner Cascadia DD15 and 2010–2017 Kenworth T660 ISX—verify nose, clocking, and battery cable size. Test batteries and grounds before condemning the starter; replace when grind, no-crank, or intermittent solenoid click appears. SKU VE-STR-HD / MPN VE-S910 is the HD gear-reduction reman starter for Cascadia and T660 cranking repairs.",
+    shortDescription:
+      "VoltEdge reman HD gear-reduction starter for Freightliner Cascadia DD15 and Kenworth T660 ISX diesels. Direct-fit when the application SKU VE-STR-HD.",
     price: 219.0,
     currency: "USD",
     sku: "VE-STR-HD",

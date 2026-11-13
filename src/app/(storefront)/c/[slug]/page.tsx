@@ -91,7 +91,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             resultCount={products.length}
           />
         </Suspense>
-        <ProductGrid products={products} />
+        <ProductGrid products={products} filterByVehicle />
       </div>
     </div>
   );

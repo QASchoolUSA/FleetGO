@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { AddToCart } from "@/components/product/AddToCart";
+import { FitmentBadge, FitmentList } from "@/components/product/FitmentBadge";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCatalog } from "@/lib/catalog/adapter";
@@ -106,17 +107,8 @@ export default async function ProductPage({ params }: Props) {
               <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
                 Vehicle fitment
               </h2>
-              <ul className="mt-3 divide-y divide-[var(--line)] rounded-lg border border-[var(--line)]">
-                {product.fitment.map((f, i) => (
-                  <li key={`${f.make}-${f.model}-${i}`} className="px-4 py-3 text-sm">
-                    <span className="font-semibold text-[var(--navy)]">
-                      {f.yearFrom}–{f.yearTo} {f.make} {f.model}
-                    </span>
-                    {f.engine ? <span className="text-[var(--ink-muted)]"> · {f.engine}</span> : null}
-                    {f.notes ? <p className="mt-1 text-[var(--ink-muted)]">{f.notes}</p> : null}
-                  </li>
-                ))}
-              </ul>
+              <FitmentBadge fitment={product.fitment} />
+              <FitmentList fitment={product.fitment} />
             </div>
           )}
 

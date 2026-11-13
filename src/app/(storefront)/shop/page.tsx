@@ -53,7 +53,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
             resultCount={products.length}
           />
         </Suspense>
-        <ProductGrid products={products} />
+        <ProductGrid products={products} filterByVehicle />
       </div>
     </div>
   );

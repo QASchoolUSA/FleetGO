@@ -5,64 +5,118 @@ export type GarageVehicle = {
   engine?: string;
 };
 
-export const vehicleCatalog: Record<
-  string,
-  Record<string, { years: [number, number]; engines: string[] }>
-> = {
-  Ford: {
-    "F-150": { years: [2011, 2024], engines: ["2.7L EcoBoost", "3.5L EcoBoost", "5.0L"] },
-    "F-250 Super Duty": { years: [2008, 2024], engines: ["6.7L Power Stroke", "7.3L"] },
-  },
-  Chevrolet: {
-    "Silverado 1500": { years: [2007, 2024], engines: ["5.3L", "6.2L"] },
-  },
-  GMC: {
-    "Sierra 1500": { years: [2007, 2024], engines: ["5.3L", "6.2L"] },
-  },
-  Ram: {
-    "1500": { years: [2011, 2024], engines: ["5.7L HEMI", "3.6L"] },
-    "2500": { years: [2011, 2024], engines: ["6.7L Cummins"] },
-  },
-  Toyota: {
-    Tacoma: { years: [2016, 2024], engines: ["3.5L"] },
-  },
-  Freightliner: {
-    Cascadia: { years: [2010, 2025], engines: ["DD13", "DD15", "X15"] },
-  },
-  Kenworth: {
-    T680: { years: [2013, 2025], engines: ["X15", "MX-13"] },
-    T660: { years: [2008, 2019], engines: ["ISX"] },
-  },
-  Peterbilt: {
-    "579": { years: [2013, 2025], engines: ["X15", "MX-13"] },
-  },
-  Volvo: {
-    VNL: { years: [2010, 2025], engines: ["D13"] },
-  },
-  International: {
-    LT: { years: [2017, 2025], engines: ["A26", "X15"] },
-  },
+export type VehicleCatalogEntry = {
+  /** Discrete years that have at least one fitting part */
+  years: number[];
+  engines: string[];
 };
 
-export function listMakes(): string[] {
-  return Object.keys(vehicleCatalog).sort();
+export type VehicleCatalog = Record<string, Record<string, VehicleCatalogEntry>>;
+
+export type FitmentRowLike = {
+  yearFrom?: number | null;
+  yearTo?: number | null;
+  make?: string | null;
+  model?: string | null;
+  engine?: string | null;
+};
+
+/** @deprecated Prefer buildVehicleCatalogFromFitment — kept for tests/legacy imports */
+export const vehicleCatalog: VehicleCatalog = {};
+
+export function buildVehicleCatalogFromFitment(
+  rows: FitmentRowLike[],
+): VehicleCatalog {
+  const yearSets = new Map<string, Map<string, Set<number>>>();
+  const engineSets = new Map<string, Map<string, Set<string>>>();
+
+  for (const row of rows) {
+    const make = row.make?.trim();
+    const model = row.model?.trim();
+    const yearFrom = row.yearFrom;
+    const yearTo = row.yearTo;
+    if (!make || !model) continue;
+    if (make.toLowerCase() === "universal") continue;
+    if (
+      typeof yearFrom !== "number" ||
+      typeof yearTo !== "number" ||
+      !Number.isFinite(yearFrom) ||
+      !Number.isFinite(yearTo)
+    ) {
+      continue;
+    }
+    const from = Math.min(yearFrom, yearTo);
+    const to = Math.max(yearFrom, yearTo);
+
+    if (!yearSets.has(make)) yearSets.set(make, new Map());
+    if (!engineSets.has(make)) engineSets.set(make, new Map());
+    const models = yearSets.get(make)!;
+    const enginesByModel = engineSets.get(make)!;
+    if (!models.has(model)) models.set(model, new Set());
+    if (!enginesByModel.has(model)) enginesByModel.set(model, new Set());
+
+    const years = models.get(model)!;
+    for (let y = from; y <= to; y++) years.add(y);
+
+    const engine = row.engine?.trim();
+    if (engine) enginesByModel.get(model)!.add(engine);
+  }
+
+  const catalog: VehicleCatalog = {};
+  for (const make of [...yearSets.keys()].sort((a, b) =>
+    a.localeCompare(b),
+  )) {
+    catalog[make] = {};
+    const models = yearSets.get(make)!;
+    for (const model of [...models.keys()].sort((a, b) =>
+      a.localeCompare(b),
+    )) {
+      const years = [...models.get(model)!].sort((a, b) => b - a);
+      const engines = [...(engineSets.get(make)?.get(model) ?? [])].sort((a, b) =>
+        a.localeCompare(b),
+      );
+      catalog[make][model] = { years, engines };
+    }
+  }
+  return catalog;
 }
 
-export function listModels(make: string): string[] {
-  return Object.keys(vehicleCatalog[make] ?? {}).sort();
+export function listMakes(catalog: VehicleCatalog = vehicleCatalog): string[] {
+  return Object.keys(catalog).sort((a, b) => a.localeCompare(b));
 }
 
-export function listYears(make: string, model: string): number[] {
-  const entry = vehicleCatalog[make]?.[model];
-  if (!entry) return [];
-  const [from, to] = entry.years;
-  const years: number[] = [];
-  for (let y = to; y >= from; y--) years.push(y);
-  return years;
+export function listModels(
+  make: string,
+  catalog: VehicleCatalog = vehicleCatalog,
+): string[] {
+  return Object.keys(catalog[make] ?? {}).sort((a, b) => a.localeCompare(b));
 }
 
-export function listEngines(make: string, model: string): string[] {
-  return vehicleCatalog[make]?.[model]?.engines ?? [];
+export function listYears(
+  make: string,
+  model: string,
+  catalog: VehicleCatalog = vehicleCatalog,
+): number[] {
+  return catalog[make]?.[model]?.years ?? [];
+}
+
+export function listEngines(
+  make: string,
+  model: string,
+  catalog: VehicleCatalog = vehicleCatalog,
+): string[] {
+  return catalog[make]?.[model]?.engines ?? [];
+}
+
+export function vehicleInCatalog(
+  vehicle: GarageVehicle,
+  catalog: VehicleCatalog,
+): boolean {
+  const years = catalog[vehicle.make]?.[vehicle.model]?.years;
+  if (!years?.includes(vehicle.year)) return false;
+  if (!vehicle.engine) return true;
+  const engines = catalog[vehicle.make]?.[vehicle.model]?.engines ?? [];
+  return engines.length === 0 || engines.includes(vehicle.engine);
 }
 
 export function vehicleLabel(v: GarageVehicle): string {
@@ -70,15 +124,36 @@ export function vehicleLabel(v: GarageVehicle): string {
 }
 
 export function productFitsVehicle(
-  fitment: { yearFrom: number; yearTo: number; make: string; model: string }[],
+  fitment: {
+    yearFrom: number;
+    yearTo: number;
+    make: string;
+    model: string;
+    engine?: string;
+  }[],
   vehicle: GarageVehicle | null,
 ): boolean {
   if (!vehicle || !fitment?.length) return false;
-  return fitment.some(
-    (f) =>
-      f.make.toLowerCase() === vehicle.make.toLowerCase() &&
-      f.model.toLowerCase() === vehicle.model.toLowerCase() &&
-      vehicle.year >= f.yearFrom &&
-      vehicle.year <= f.yearTo,
-  );
+  return fitment.some((f) => {
+    const make = f.make?.toLowerCase() ?? "";
+    if (make === "universal") {
+      if (
+        typeof f.yearFrom === "number" &&
+        typeof f.yearTo === "number" &&
+        (vehicle.year < f.yearFrom || vehicle.year > f.yearTo)
+      ) {
+        return false;
+      }
+      return true;
+    }
+    if (make !== vehicle.make.toLowerCase()) return false;
+    if ((f.model?.toLowerCase() ?? "") !== vehicle.model.toLowerCase()) {
+      return false;
+    }
+    if (vehicle.year < f.yearFrom || vehicle.year > f.yearTo) return false;
+    if (f.engine?.trim() && vehicle.engine?.trim()) {
+      return f.engine.trim().toLowerCase() === vehicle.engine.trim().toLowerCase();
+    }
+    return true;
+  });
 }

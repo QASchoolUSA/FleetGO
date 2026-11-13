@@ -39,7 +39,7 @@ export default async function BrandPage({ params }: Props) {
         <p className="mt-3 max-w-2xl text-[var(--ink-muted)]">{brand.description}</p>
       ) : null}
       <div className="mt-8">
-        <ProductGrid products={products} />
+        <ProductGrid products={products} filterByVehicle />
       </div>
     </div>
   );

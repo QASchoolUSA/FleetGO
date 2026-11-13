@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
       </p>
       <div className="mt-8">
-        <ProductGrid products={products} />
+        <ProductGrid products={products} filterByVehicle />
       </div>
     </div>
   );

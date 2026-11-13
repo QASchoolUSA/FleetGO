@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Amazon / marketplace one-time export outputs
+/exports/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

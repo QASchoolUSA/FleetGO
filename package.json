@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
+    "export:amazon": "tsx scripts/export-amazon-flatfile.ts",
+    "export:google-merchant": "tsx scripts/export-google-merchant-feed.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {

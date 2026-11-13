@@ -36,6 +36,7 @@ See [`.env.example`](.env.example):
 | `SANITY_REVALIDATE_SECRET` | On-demand revalidation webhook |
 | `INVENTORY_SYNC_SECRET` | Shared Bearer secret for `POST /api/inventory/sync` from Convex |
 | `AUTO_PUBLISH` | Optional; default publish live (set `false` for Sanity drafts) |
+| `GOOGLE_MERCHANT_FEED_SECRET` | Auth for `GET /api/feeds/google-merchant` (Merchant Center scheduled fetch) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 | `STRIPE_SECRET_KEY` | Stripe secret (test mode OK) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
@@ -81,6 +82,16 @@ Set the same `INVENTORY_SYNC_SECRET` on the Convex deployment (`FLEETGO_SYNC_URL
 - Cart, checkout, studio, and API routes are disallowed for crawlers
 - Optional Google / Bing verification fields on Sanity `siteSettings`
 
+## Google Shopping (Merchant Center)
+
+Primary product feed (TSV) for scheduled fetch:
+
+```text
+GET /api/feeds/google-merchant?key=<GOOGLE_MERCHANT_FEED_SECRET>
+```
+
+Validate locally with `npm run export:google-merchant` (writes `exports/google-merchant.tsv` + report). Setup steps: [`scripts/GOOGLE_MERCHANT_FEED.md`](scripts/GOOGLE_MERCHANT_FEED.md).
+
 ## Routes
 
 | Path | Description |
@@ -93,6 +104,7 @@ Set the same `INVENTORY_SYNC_SECRET` on the Convex deployment (`FLEETGO_SYNC_URL
 | `/search` | Search |
 | `/cart` / `/checkout` | Cart & Stripe |
 | `/studio` | Sanity Studio |
+| `/api/feeds/google-merchant` | Google Merchant Center TSV feed |
 
 ## Convex bridge
 
@@ -101,9 +113,11 @@ Inventory-Management-System Convex enriches scanned barcodes and publishes into 
 ## Scripts
 
 ```bash
-npm run dev      # local storefront
-npm run build    # production build
-npm run start    # serve build
-npm run seed     # push sample catalog to Sanity
-npm run lint     # eslint
+npm run dev                   # local storefront
+npm run build                 # production build
+npm run start                 # serve build
+npm run seed                  # push sample catalog to Sanity
+npm run export:amazon         # Amazon FBM flat files
+npm run export:google-merchant # Google Merchant TSV + report
+npm run lint                  # eslint
 ```

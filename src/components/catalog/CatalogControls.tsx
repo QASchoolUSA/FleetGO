@@ -113,7 +113,7 @@ function FilterPanel({
   return (
     <div className="space-y-7">
       <section>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
           Vehicle duty
         </h3>
         <div className="mt-2 grid grid-cols-3 gap-1.5">
@@ -139,7 +139,7 @@ function FilterPanel({
       </section>
 
       <section>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
           Price
         </h3>
         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -155,7 +155,7 @@ function FilterPanel({
                 onNavigate?.();
               }}
               className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-medium",
+                "rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
                 presetId === preset.id
                   ? "border-[var(--field)] bg-[var(--field)] text-white"
                   : "border-[var(--line)] bg-white text-[var(--navy)]",
@@ -192,7 +192,7 @@ function FilterPanel({
           <button
             type="button"
             onClick={applyCustomPrice}
-            className="h-10 w-full rounded-md bg-[var(--surface-muted)] px-3 text-xs font-bold uppercase tracking-wide text-[var(--navy)]"
+            className="h-10 w-full rounded-md bg-[var(--surface-muted)] px-3 text-xs font-medium text-[var(--navy)] transition-colors hover:bg-[var(--line)]"
           >
             Go
           </button>
@@ -200,7 +200,7 @@ function FilterPanel({
       </section>
 
       <section>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
           Availability
         </h3>
         <button
@@ -229,7 +229,7 @@ function FilterPanel({
       </section>
 
       <section>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
           Categories
         </h3>
         <ul className="mt-2 max-h-48 space-y-0.5 overflow-y-auto pr-1">
@@ -267,7 +267,7 @@ function FilterPanel({
       </section>
 
       <section>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
           Brands
         </h3>
         <ul className="mt-2 max-h-48 space-y-0.5 overflow-y-auto pr-1">
@@ -342,22 +342,22 @@ export function CatalogControls({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 text-sm font-semibold text-[var(--navy)] shadow-sm"
+            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 text-sm font-medium text-[var(--navy)]"
           >
-            <SlidersHorizontal className="h-4 w-4" />
+            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
             Filters
             {activeCount > 0 ? (
-              <span className="rounded-full bg-[var(--field)] px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded-md bg-[var(--field)] px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-white">
                 {activeCount}
               </span>
             ) : null}
           </button>
-          <label className="relative inline-flex h-11 min-w-[46%] max-w-[52%] flex-1 items-center rounded-md border border-[var(--line)] bg-white shadow-sm">
-            <ArrowUpDown className="pointer-events-none absolute left-3 h-4 w-4 text-[var(--ink-muted)]" />
+          <label className="relative inline-flex h-11 min-w-[46%] max-w-[52%] flex-1 items-center rounded-md border border-[var(--line)] bg-white">
+            <ArrowUpDown className="pointer-events-none absolute left-3 h-4 w-4 text-[var(--ink-muted)]" strokeWidth={1.5} />
             <select
               value={sort}
               onChange={(e) => pushParams({ sort: e.target.value })}
-              className="h-full w-full appearance-none rounded-md bg-transparent py-2 pl-9 pr-7 text-sm font-semibold text-[var(--navy)] outline-none"
+              className="h-full w-full appearance-none rounded-md bg-transparent py-2 pl-9 pr-7 text-sm font-medium text-[var(--navy)] outline-none"
               aria-label="Sort products"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -372,13 +372,13 @@ export function CatalogControls({
         {/* Desktop sidebar */}
         <aside className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
           <div className="mb-5 rounded-lg border border-[var(--line)] bg-white p-3">
-            <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+            <label className="block text-xs font-medium text-[var(--ink-muted)]">
               Sort by
             </label>
             <select
               value={sort}
               onChange={(e) => pushParams({ sort: e.target.value })}
-              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 text-sm font-semibold text-[var(--navy)] outline-none focus:border-[var(--field)]"
+              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 text-sm font-medium text-[var(--navy)] outline-none focus:border-[var(--field)]"
               aria-label="Sort products"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -390,7 +390,7 @@ export function CatalogControls({
           </div>
           <div className="rounded-lg border border-[var(--line)] bg-white p-4">
             <div className="mb-4 flex items-center justify-between gap-2">
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-bold uppercase tracking-wide text-[var(--navy)]">
+              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold uppercase tracking-wide text-[var(--navy)]">
                 Filters
               </h2>
               {activeCount > 0 ? (
@@ -429,17 +429,17 @@ export function CatalogControls({
               role="dialog"
               aria-modal="true"
               aria-labelledby="filters-title"
-              className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-2xl bg-white shadow-2xl"
+              className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-xl bg-white shadow-xl"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 380, damping: 36 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3">
                 <div>
                   <h2
                     id="filters-title"
-                    className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]"
+                    className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]"
                   >
                     Filters
                   </h2>
@@ -474,7 +474,7 @@ export function CatalogControls({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="h-11 flex-[1.4] rounded-md bg-[var(--signal)] text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)]"
+                  className="h-11 flex-[1.4] rounded-md bg-[var(--signal)] text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[var(--signal-dark)]"
                 >
                   Show {resultCount} results
                 </button>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function ShippingPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
+      <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold uppercase tracking-wide text-[var(--navy)]">
         Shipping
       </h1>
       <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--ink-muted)]">

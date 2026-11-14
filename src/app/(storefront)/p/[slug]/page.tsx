@@ -53,43 +53,43 @@ export default async function ProductPage({ params }: Props) {
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery images={product.images} title={product.title} />
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+          <p className="text-xs font-medium text-[var(--ink-muted)]">
             <Link href={`/brands/${product.brandSlug}`} className="hover:text-[var(--field)]">
               {product.brand}
             </Link>
           </p>
-          <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold uppercase leading-tight tracking-wide text-[var(--navy)] sm:text-4xl">
+          <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold leading-tight tracking-wide text-[var(--navy)] sm:text-4xl">
             {product.title}
           </h1>
           <div className="mt-4 flex flex-wrap items-end gap-3">
-            <p className="text-3xl font-bold text-[var(--navy)]">
+            <p className="text-3xl font-semibold tabular-nums text-[var(--navy)]">
               {formatMoney(product.price, product.currency)}
             </p>
             {product.compareAtPrice ? (
-              <p className="pb-1 text-base text-[var(--ink-muted)] line-through">
+              <p className="pb-1 text-base tabular-nums text-[var(--ink-muted)] line-through">
                 {formatMoney(product.compareAtPrice, product.currency)}
               </p>
             ) : null}
-            <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-semibold text-[var(--ink-muted)]">
+            <span className="rounded-md bg-[var(--surface-muted)] px-3 py-1 text-xs font-medium text-[var(--ink-muted)]">
               {stockLabel(product.stockStatus)}
             </span>
           </div>
 
           <dl className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
             <div className="rounded-md border border-[var(--line)] p-3">
-              <dt className="text-[11px] uppercase tracking-wide text-[var(--ink-muted)]">SKU</dt>
-              <dd className="mt-1 font-semibold">{product.sku}</dd>
+              <dt className="text-xs font-medium text-[var(--ink-muted)]">SKU</dt>
+              <dd className="mt-1 font-medium tabular-nums">{product.sku}</dd>
             </div>
             {product.mpn ? (
               <div className="rounded-md border border-[var(--line)] p-3">
-                <dt className="text-[11px] uppercase tracking-wide text-[var(--ink-muted)]">MPN</dt>
-                <dd className="mt-1 font-semibold">{product.mpn}</dd>
+                <dt className="text-xs font-medium text-[var(--ink-muted)]">MPN</dt>
+                <dd className="mt-1 font-medium tabular-nums">{product.mpn}</dd>
               </div>
             ) : null}
             {product.barcode ? (
               <div className="rounded-md border border-[var(--line)] p-3">
-                <dt className="text-[11px] uppercase tracking-wide text-[var(--ink-muted)]">Barcode</dt>
-                <dd className="mt-1 font-semibold">{product.barcode}</dd>
+                <dt className="text-xs font-medium text-[var(--ink-muted)]">Barcode</dt>
+                <dd className="mt-1 font-medium tabular-nums">{product.barcode}</dd>
               </div>
             ) : null}
           </dl>
@@ -98,13 +98,13 @@ export default async function ProductPage({ params }: Props) {
             {product.description}
           </p>
 
-          <div className="sticky bottom-0 z-20 mt-8 border-t border-[var(--line)] bg-white/95 py-4 backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+          <div className="sticky bottom-0 z-20 mt-8 border-t border-[var(--line)] bg-[var(--surface)] py-4 sm:static sm:border-0 sm:bg-transparent sm:p-0">
             <AddToCart product={product} />
           </div>
 
           {product.fitment.length > 0 && (
             <div className="mt-10">
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
                 Vehicle fitment
               </h2>
               <FitmentBadge fitment={product.fitment} />
@@ -114,14 +114,14 @@ export default async function ProductPage({ params }: Props) {
 
           {product.specs.length > 0 && (
             <div className="mt-10">
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
                 Specs
               </h2>
               <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                 {product.specs.map((spec) => (
                   <div key={spec.label} className="flex justify-between gap-3 rounded-md bg-[var(--surface-muted)] px-3 py-2 text-sm">
                     <dt className="text-[var(--ink-muted)]">{spec.label}</dt>
-                    <dd className="font-semibold">{spec.value}</dd>
+                    <dd className="font-medium">{spec.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -132,7 +132,7 @@ export default async function ProductPage({ params }: Props) {
 
       {related.length > 0 && (
         <section className="mt-16">
-          <h2 className="mb-6 font-[family-name:var(--font-display)] text-2xl font-bold uppercase tracking-wide text-[var(--navy)]">
+          <h2 className="mb-6 font-[family-name:var(--font-display)] text-2xl font-semibold uppercase tracking-wide text-[var(--navy)]">
             Related parts
           </h2>
           <ProductGrid products={related} />

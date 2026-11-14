@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
+      <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold uppercase tracking-wide text-[var(--navy)]">
         About FleetGo
       </h1>
-      <div className="prose-fleet mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--ink-muted)]">
+      <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--ink-muted)]">
         <p>
           FleetGo is built for shops, fleets, and owner-operators who need the right part without the noise.
           We focus on clear part numbers, vehicle fitment, and a catalog that spans light-duty trucks through Class 8.

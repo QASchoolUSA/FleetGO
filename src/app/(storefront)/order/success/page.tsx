@@ -15,10 +15,10 @@ export default async function OrderSuccessPage({ searchParams }: Props) {
   return (
     <div className="mx-auto max-w-xl px-4 py-16 text-center sm:px-6">
       <ClearCartOnSuccess />
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--field)]">
+      <p className="text-xs font-medium text-[var(--field)]">
         Thank you
       </p>
-      <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
+      <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-semibold uppercase tracking-wide text-[var(--navy)]">
         Order confirmed
       </h1>
       <p className="mt-4 text-[var(--ink-muted)]">
@@ -30,7 +30,7 @@ export default async function OrderSuccessPage({ searchParams }: Props) {
       ) : null}
       <Link
         href="/shop"
-        className="mt-8 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]"
+        className="mt-8 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--navy)]"
       >
         Keep shopping
       </Link>

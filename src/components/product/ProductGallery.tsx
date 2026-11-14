@@ -24,9 +24,9 @@ export function ProductGallery({
       <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--surface-muted)]">
         <motion.div
           key={current.url}
-          initial={{ opacity: 0.4, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.28 }}
+          initial={{ opacity: 0.35 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
           <Image

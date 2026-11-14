@@ -4,9 +4,9 @@ import type { CatalogCategory } from "@/lib/catalog/types";
 
 export function FeaturedCategories({ categories }: { categories: CatalogCategory[] }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16">
       <div className="mb-8 max-w-2xl">
-        <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
+        <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
           Shop by category
         </h2>
         <p className="mt-2 text-[var(--ink-muted)]">
@@ -18,9 +18,9 @@ export function FeaturedCategories({ categories }: { categories: CatalogCategory
           <li key={cat.id} className="bg-[var(--surface)]">
             <Link
               href={`/c/${cat.slug}`}
-              className="group flex h-full min-h-[5.5rem] flex-col justify-between gap-3 px-4 py-4 transition hover:bg-[var(--surface-muted)] focus-visible:bg-[var(--surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--field)] sm:min-h-[6.5rem] sm:px-5 sm:py-5"
+              className="group flex h-full min-h-[5.5rem] flex-col justify-between gap-3 px-4 py-4 transition-colors hover:bg-[var(--surface-muted)] focus-visible:bg-[var(--surface-muted)] sm:min-h-[6.5rem] sm:px-5 sm:py-5"
             >
-              <span className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-2xl">
+              <span className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)] sm:text-2xl">
                 {cat.title}
               </span>
               <span className="flex items-end justify-between gap-3">
@@ -32,7 +32,8 @@ export function FeaturedCategories({ categories }: { categories: CatalogCategory
                   <span className="text-sm text-[var(--ink-muted)]">Browse parts</span>
                 )}
                 <ArrowRight
-                  className="mt-0.5 h-4 w-4 shrink-0 text-[var(--field)] transition group-hover:translate-x-0.5"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-[var(--field)] transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={1.5}
                   aria-hidden
                 />
               </span>

@@ -21,14 +21,12 @@ const items = [
 export function TrustStrip() {
   return (
     <section className="border-y border-[var(--line)] bg-[var(--surface-muted)]">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl divide-y divide-[var(--line)] md:grid-cols-3 md:divide-x md:divide-y-0">
         {items.map(({ icon: Icon, title, copy }) => (
-          <div key={title} className="flex gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[var(--field)] text-white">
-              <Icon className="h-5 w-5" />
-            </div>
+          <div key={title} className="flex gap-3 px-4 py-6 sm:px-6 sm:py-7">
+            <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--field)]" strokeWidth={1.5} />
             <div>
-              <h3 className="font-semibold text-[var(--navy)]">{title}</h3>
+              <h3 className="text-sm font-medium text-[var(--navy)]">{title}</h3>
               <p className="mt-1 text-sm leading-relaxed text-[var(--ink-muted)]">{copy}</p>
             </div>
           </div>

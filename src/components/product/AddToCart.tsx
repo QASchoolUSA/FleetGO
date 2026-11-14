@@ -20,7 +20,7 @@ export function AddToCart({ product }: { product: CatalogProduct }) {
           max={99}
           value={qty}
           onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
-          className="h-11 w-20 rounded-md border border-[var(--line)] px-3"
+          className="h-11 w-20 rounded-md border border-[var(--line)] px-3 tabular-nums"
         />
       </label>
       <button
@@ -40,7 +40,7 @@ export function AddToCart({ product }: { product: CatalogProduct }) {
             qty,
           )
         }
-        className="h-12 flex-1 rounded-md bg-[var(--signal)] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-xs"
+        className="h-12 flex-1 rounded-md bg-[var(--signal)] px-6 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[var(--signal-dark)] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-xs"
       >
         {disabled ? "Unavailable" : "Add to cart"}
       </button>

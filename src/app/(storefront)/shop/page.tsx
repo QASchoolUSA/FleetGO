@@ -37,7 +37,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
       </nav>
 
       <div className="mb-5 sm:mb-6">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
+        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
           Shop all parts
         </h1>
         <p className="mt-1.5 text-sm font-medium text-[var(--ink-muted)]">

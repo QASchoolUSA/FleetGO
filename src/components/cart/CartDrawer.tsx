@@ -29,18 +29,18 @@ export function CartDrawer() {
             onClick={closeCart}
           />
           <motion.aside
-            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-[var(--surface)] shadow-2xl"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-[var(--surface)] shadow-xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 360, damping: 34 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-4">
-              <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
                 Your cart
               </h2>
               <button type="button" onClick={closeCart} aria-label="Close cart">
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" strokeWidth={1.5} />
               </button>
             </div>
 
@@ -51,7 +51,7 @@ export function CartDrawer() {
                   <Link
                     href="/shop"
                     onClick={closeCart}
-                    className="rounded-md bg-[var(--field)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]"
+                    className="rounded-md bg-[var(--field)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--navy)]"
                   >
                     Browse parts
                   </Link>
@@ -69,29 +69,31 @@ export function CartDrawer() {
                         <Link
                           href={`/p/${item.slug}`}
                           onClick={closeCart}
-                          className="line-clamp-2 text-sm font-semibold text-[var(--navy)] hover:underline"
+                          className="line-clamp-2 text-sm font-medium text-[var(--navy)] hover:underline"
                         >
                           {item.title}
                         </Link>
-                        <p className="mt-0.5 text-xs text-[var(--ink-muted)]">SKU {item.sku}</p>
-                        <p className="mt-1 text-sm font-bold">{formatMoney(item.price, item.currency)}</p>
+                        <p className="mt-0.5 text-xs tabular-nums text-[var(--ink-muted)]">SKU {item.sku}</p>
+                        <p className="mt-1 text-sm font-semibold tabular-nums">
+                          {formatMoney(item.price, item.currency)}
+                        </p>
                         <div className="mt-2 flex items-center gap-2">
                           <button
                             type="button"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded border border-[var(--line)]"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--line)] transition-colors hover:bg-[var(--surface-muted)]"
                             onClick={() => setQuantity(item.productId, item.quantity - 1)}
                             aria-label="Decrease quantity"
                           >
-                            <Minus className="h-3.5 w-3.5" />
+                            <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
                           </button>
-                          <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
+                          <span className="w-6 text-center text-sm font-medium tabular-nums">{item.quantity}</span>
                           <button
                             type="button"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded border border-[var(--line)]"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--line)] transition-colors hover:bg-[var(--surface-muted)]"
                             onClick={() => setQuantity(item.productId, item.quantity + 1)}
                             aria-label="Increase quantity"
                           >
-                            <Plus className="h-3.5 w-3.5" />
+                            <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
                           </button>
                           <button
                             type="button"
@@ -112,19 +114,21 @@ export function CartDrawer() {
               <div className="border-t border-[var(--line)] p-4">
                 <div className="mb-3 flex items-center justify-between text-sm">
                   <span className="text-[var(--ink-muted)]">Subtotal</span>
-                  <span className="text-lg font-bold text-[var(--navy)]">{formatMoney(subtotal)}</span>
+                  <span className="text-lg font-semibold tabular-nums text-[var(--navy)]">
+                    {formatMoney(subtotal)}
+                  </span>
                 </div>
                 <Link
                   href="/cart"
                   onClick={closeCart}
-                  className="mb-2 flex h-11 items-center justify-center rounded-md border border-[var(--line)] font-semibold"
+                  className="mb-2 flex h-11 items-center justify-center rounded-md border border-[var(--line)] font-medium transition-colors hover:bg-[var(--surface-muted)]"
                 >
                   View cart
                 </Link>
                 <Link
                   href="/checkout"
                   onClick={closeCart}
-                  className="flex h-11 items-center justify-center rounded-md bg-[var(--signal)] font-semibold text-white transition hover:bg-[var(--signal-dark)]"
+                  className="flex h-11 items-center justify-center rounded-md bg-[var(--signal)] font-semibold text-white transition-colors hover:bg-[var(--signal-dark)]"
                 >
                   Checkout
                 </Link>

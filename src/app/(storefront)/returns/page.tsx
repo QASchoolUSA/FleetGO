@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function ReturnsPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
+      <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold uppercase tracking-wide text-[var(--navy)]">
         Return Policy
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -22,7 +22,7 @@ export default function ReturnsPage() {
       <p className="mt-2 text-xs text-[var(--ink-muted)]">Last updated: November 13, 2026</p>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           What qualifies as defective
         </h2>
         <p className="text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -39,7 +39,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           What we do not accept
         </h2>
         <ul className="list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -52,7 +52,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           Exchanges
         </h2>
         <p className="text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -68,7 +68,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           Refunds &amp; credits
         </h2>
         <p className="text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -84,7 +84,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           How to start a claim
         </h2>
         <ol className="list-decimal space-y-2 pl-5 text-[15px] leading-relaxed text-[var(--ink-muted)]">
@@ -109,7 +109,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)]">
+        <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold uppercase tracking-wide text-[var(--navy)]">
           Carrier damage
         </h2>
         <p className="text-[15px] leading-relaxed text-[var(--ink-muted)]">

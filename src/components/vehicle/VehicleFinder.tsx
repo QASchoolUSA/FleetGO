@@ -135,17 +135,17 @@ export function VehicleFinder({
             role="dialog"
             aria-modal="true"
             aria-labelledby="vehicle-finder-title"
-            className="relative z-10 w-full max-w-lg rounded-t-2xl bg-[var(--surface)] p-5 shadow-2xl sm:rounded-2xl sm:p-6"
-            initial={{ y: 40, opacity: 0 }}
+            className="relative z-10 w-full max-w-lg rounded-t-xl bg-[var(--surface)] p-5 shadow-xl sm:rounded-xl sm:p-6"
+            initial={{ y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 24, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+            exit={{ y: 16, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h2
                   id="vehicle-finder-title"
-                  className="font-[family-name:var(--font-display)] text-2xl font-bold uppercase tracking-wide text-[var(--navy)]"
+                  className="font-[family-name:var(--font-display)] text-2xl font-semibold uppercase tracking-wide text-[var(--navy)]"
                 >
                   Find parts that fit
                 </h2>
@@ -158,9 +158,9 @@ export function VehicleFinder({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="rounded p-1 hover:bg-[var(--surface-muted)]"
+                className="rounded-md p-1 transition-colors hover:bg-[var(--surface-muted)]"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" strokeWidth={1.5} />
               </button>
             </div>
 
@@ -268,7 +268,7 @@ export function VehicleFinder({
                 disabled={
                   loading || emptyCatalog || loadError || !make || !model || !year
                 }
-                className="h-11 flex-1 rounded-md bg-[var(--field)] font-semibold text-white transition hover:bg-[var(--field-bright)] disabled:opacity-40"
+                className="h-11 flex-1 rounded-md bg-[var(--field)] font-semibold text-white transition-colors hover:bg-[var(--navy)] disabled:opacity-40"
               >
                 Save vehicle
               </button>

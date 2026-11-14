@@ -23,17 +23,20 @@ export default async function HomePage() {
       <Hero />
       <TrustStrip />
       <FeaturedCategories categories={categories} />
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-16">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
               Featured parts
             </h2>
             <p className="mt-2 text-[var(--ink-muted)]">
               High-turn SKUs for light-duty and Class 8 maintenance.
             </p>
           </div>
-          <Link href="/shop" className="hidden text-sm font-semibold text-[var(--field)] hover:underline sm:inline">
+          <Link
+            href="/shop"
+            className="hidden text-sm font-medium text-[var(--field)] hover:underline sm:inline"
+          >
             View all
           </Link>
         </div>

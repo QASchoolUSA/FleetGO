@@ -19,13 +19,13 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold uppercase tracking-wide text-[var(--navy)]">
+      <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold uppercase tracking-wide text-[var(--navy)]">
         Search results
       </h1>
       <p className="mt-2 text-[var(--ink-muted)]">
         {q ? (
           <>
-            Showing results for <span className="font-semibold text-[var(--navy)]">&ldquo;{q}&rdquo;</span> —{" "}
+            Showing results for <span className="font-medium text-[var(--navy)]">&ldquo;{q}&rdquo;</span> —{" "}
             {products.length} found
           </>
         ) : (

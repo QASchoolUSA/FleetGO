@@ -14,8 +14,11 @@ export function CartView() {
   if (!items.length) {
     return (
       <div className="rounded-lg border border-dashed border-[var(--line)] px-6 py-16 text-center">
-        <p className="font-semibold text-[var(--navy)]">Your cart is empty</p>
-        <Link href="/shop" className="mt-4 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--field-bright)]">
+        <p className="font-medium text-[var(--navy)]">Your cart is empty</p>
+        <Link
+          href="/shop"
+          className="mt-4 inline-flex h-11 items-center rounded-md bg-[var(--field)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--navy)]"
+        >
           Continue shopping
         </Link>
       </div>
@@ -33,18 +36,18 @@ export function CartView() {
               ) : null}
             </div>
             <div className="min-w-0 flex-1">
-              <Link href={`/p/${item.slug}`} className="font-semibold text-[var(--navy)] hover:underline">
+              <Link href={`/p/${item.slug}`} className="font-medium text-[var(--navy)] hover:underline">
                 {item.title}
               </Link>
-              <p className="mt-1 text-xs text-[var(--ink-muted)]">SKU {item.sku}</p>
-              <p className="mt-2 font-bold">{formatMoney(item.price, item.currency)}</p>
+              <p className="mt-1 text-xs tabular-nums text-[var(--ink-muted)]">SKU {item.sku}</p>
+              <p className="mt-2 font-semibold tabular-nums">{formatMoney(item.price, item.currency)}</p>
               <div className="mt-3 flex items-center gap-3">
                 <input
                   type="number"
                   min={1}
                   value={item.quantity}
                   onChange={(e) => setQuantity(item.productId, Number(e.target.value) || 1)}
-                  className="h-10 w-20 rounded-md border border-[var(--line)] px-2"
+                  className="h-10 w-20 rounded-md border border-[var(--line)] px-2 tabular-nums"
                 />
                 <button
                   type="button"
@@ -61,14 +64,14 @@ export function CartView() {
       <aside className="h-fit rounded-lg border border-[var(--line)] bg-[var(--surface-muted)] p-5">
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--ink-muted)]">Subtotal</span>
-          <span className="text-xl font-bold text-[var(--navy)]">{formatMoney(subtotal)}</span>
+          <span className="text-xl font-semibold tabular-nums text-[var(--navy)]">{formatMoney(subtotal)}</span>
         </div>
         <p className="mt-2 text-xs text-[var(--ink-muted)]">
           Shipping and tax calculated at checkout.
         </p>
         <Link
           href="/checkout"
-          className="mt-5 flex h-12 items-center justify-center rounded-md bg-[var(--signal)] font-bold uppercase tracking-wide text-white transition hover:bg-[var(--signal-dark)]"
+          className="mt-5 flex h-12 items-center justify-center rounded-md bg-[var(--signal)] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[var(--signal-dark)]"
         >
           Checkout
         </Link>

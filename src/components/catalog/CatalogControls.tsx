@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowUpDown, Check, SlidersHorizontal, X } from "lucide-react";
 import type { CatalogBrand, CatalogCategory } from "@/lib/catalog/types";
 import {
@@ -23,9 +23,9 @@ type Props = {
 };
 
 const DUTY_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "light", label: "Light duty" },
-  { value: "semi", label: "Semi / HD" },
+  { value: "all", label: "All", short: "All", title: "All duties" },
+  { value: "light", label: "Light duty", short: "Light", title: "Light duty" },
+  { value: "semi", label: "Semi / HD", short: "Semi", title: "Semi / HD" },
 ] as const;
 
 function useCatalogQueryState() {
@@ -111,38 +111,45 @@ function FilterPanel({
   }
 
   return (
-    <div className="space-y-7">
-      <section>
-        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
+    <div className="divide-y divide-[var(--line)]">
+      <section className="pb-5">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
           Vehicle duty
         </h3>
-        <div className="mt-2 grid grid-cols-3 gap-1.5">
+        <div
+          className="mt-2.5 grid grid-cols-3 gap-0.5 rounded-md border border-[var(--line)] bg-[var(--surface-muted)] p-0.5"
+          role="group"
+          aria-label="Vehicle duty"
+        >
           {DUTY_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
+              title={opt.title}
+              aria-label={opt.title}
+              aria-pressed={duty === opt.value}
               onClick={() => {
                 pushParams({ duty: opt.value });
                 onNavigate?.();
               }}
               className={cn(
-                "rounded-md border px-2 py-2.5 text-center text-xs font-semibold sm:text-sm",
+                "rounded-[5px] px-1.5 py-2 text-center text-xs font-semibold transition-colors",
                 duty === opt.value
-                  ? "border-[var(--field)] bg-[var(--field)] text-white"
-                  : "border-[var(--line)] bg-white text-[var(--navy)]",
+                  ? "bg-white text-[var(--navy)] shadow-sm"
+                  : "text-[var(--ink-muted)] hover:text-[var(--navy)]",
               )}
             >
-              {opt.label}
+              {opt.short}
             </button>
           ))}
         </div>
       </section>
 
-      <section>
-        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
+      <section className="py-5">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
           Price
         </h3>
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {PRICE_PRESETS.map((preset) => (
             <button
               key={preset.id}
@@ -155,10 +162,10 @@ function FilterPanel({
                 onNavigate?.();
               }}
               className={cn(
-                "rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+                "rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors",
                 presetId === preset.id
                   ? "border-[var(--field)] bg-[var(--field)] text-white"
-                  : "border-[var(--line)] bg-white text-[var(--navy)]",
+                  : "border-[var(--line)] bg-white text-[var(--navy)] hover:border-[var(--field)]/35",
               )}
             >
               {preset.label}
@@ -192,15 +199,15 @@ function FilterPanel({
           <button
             type="button"
             onClick={applyCustomPrice}
-            className="h-10 w-full rounded-md bg-[var(--surface-muted)] px-3 text-xs font-medium text-[var(--navy)] transition-colors hover:bg-[var(--line)]"
+            className="h-10 w-full rounded-md border border-[var(--line)] bg-white px-3 text-xs font-semibold text-[var(--navy)] transition-colors hover:border-[var(--field)]/35"
           >
-            Go
+            Apply range
           </button>
         </div>
       </section>
 
-      <section>
-        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
+      <section className="py-5">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
           Availability
         </h3>
         <button
@@ -210,10 +217,10 @@ function FilterPanel({
             onNavigate?.();
           }}
           className={cn(
-            "mt-2 flex w-full items-center gap-2 rounded-md border px-3 py-2.5 text-left text-sm",
+            "mt-2.5 flex w-full items-center gap-2.5 rounded-md border px-3 py-2.5 text-left text-sm transition-colors",
             inStock
               ? "border-[var(--field)] bg-[var(--field)] text-white"
-              : "border-[var(--line)] bg-white text-[var(--navy)]",
+              : "border-[var(--line)] bg-white text-[var(--navy)] hover:border-[var(--field)]/35",
           )}
         >
           <span
@@ -228,8 +235,8 @@ function FilterPanel({
         </button>
       </section>
 
-      <section>
-        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
+      <section className="py-5">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
           Categories
         </h3>
         <ul className="mt-2 max-h-48 space-y-0.5 overflow-y-auto pr-1">
@@ -238,7 +245,7 @@ function FilterPanel({
               href="/shop"
               onClick={onNavigate}
               className={cn(
-                "block rounded-md px-2 py-2 text-sm",
+                "block rounded-md px-2 py-2 text-sm transition-colors",
                 !activeCategory && pathname.startsWith("/shop")
                   ? "bg-[var(--surface-muted)] font-semibold text-[var(--navy)]"
                   : "text-[var(--ink)] hover:bg-[var(--surface-muted)]",
@@ -253,7 +260,7 @@ function FilterPanel({
                 href={`/c/${cat.slug}`}
                 onClick={onNavigate}
                 className={cn(
-                  "block rounded-md px-2 py-2 text-sm",
+                  "block rounded-md px-2 py-2 text-sm transition-colors",
                   activeCategory === cat.slug
                     ? "bg-[var(--surface-muted)] font-semibold text-[var(--navy)]"
                     : "text-[var(--ink)] hover:bg-[var(--surface-muted)]",
@@ -266,8 +273,8 @@ function FilterPanel({
         </ul>
       </section>
 
-      <section>
-        <h3 className="text-xs font-medium text-[var(--ink-muted)]">
+      <section className="pt-5">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
           Brands
         </h3>
         <ul className="mt-2 max-h-48 space-y-0.5 overflow-y-auto pr-1">
@@ -282,14 +289,14 @@ function FilterPanel({
                     onNavigate?.();
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm",
+                    "flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm transition-colors",
                     active
                       ? "bg-[var(--surface-muted)] font-semibold text-[var(--navy)]"
                       : "text-[var(--ink)] hover:bg-[var(--surface-muted)]",
                   )}
                 >
                   {b.title}
-                  {active ? <Check className="h-3.5 w-3.5" /> : null}
+                  {active ? <Check className="h-3.5 w-3.5 text-[var(--field)]" /> : null}
                 </button>
               </li>
             );
@@ -307,6 +314,7 @@ export function CatalogControls({
   resultCount,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const { duty, brand, sort, minNum, maxNum, inStock, pushParams, clearFilters } =
     useCatalogQueryState();
 
@@ -334,26 +342,32 @@ export function CatalogControls({
     };
   }, [open]);
 
+  const sheetTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
+
   return (
     <>
       <div className="lg:contents">
-        {/* Mobile / tablet toolbar — keeps the product grid uncluttered */}
         <div className="mb-4 flex items-center gap-2 lg:hidden">
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 text-sm font-medium text-[var(--navy)]"
+            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 text-sm font-medium text-[var(--navy)] transition-colors hover:border-[var(--field)]/35"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
             Filters
             {activeCount > 0 ? (
-              <span className="rounded-md bg-[var(--field)] px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-white">
+              <span className="rounded bg-[var(--field)] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-white">
                 {activeCount}
               </span>
             ) : null}
           </button>
-          <label className="relative inline-flex h-11 min-w-[46%] max-w-[52%] flex-1 items-center rounded-md border border-[var(--line)] bg-white">
-            <ArrowUpDown className="pointer-events-none absolute left-3 h-4 w-4 text-[var(--ink-muted)]" strokeWidth={1.5} />
+          <label className="relative inline-flex h-11 min-w-[46%] max-w-[52%] flex-1 items-center rounded-md border border-[var(--line)] bg-white transition-colors hover:border-[var(--field)]/35">
+            <ArrowUpDown
+              className="pointer-events-none absolute left-3 h-4 w-4 text-[var(--ink-muted)]"
+              strokeWidth={1.5}
+            />
             <select
               value={sort}
               onChange={(e) => pushParams({ sort: e.target.value })}
@@ -369,16 +383,15 @@ export function CatalogControls({
           </label>
         </div>
 
-        {/* Desktop sidebar */}
         <aside className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
-          <div className="mb-5 rounded-lg border border-[var(--line)] bg-white p-3">
-            <label className="block text-xs font-medium text-[var(--ink-muted)]">
+          <div className="mb-4">
+            <label className="block text-xs font-medium uppercase tracking-wide text-[var(--ink-muted)]">
               Sort by
             </label>
             <select
               value={sort}
               onChange={(e) => pushParams({ sort: e.target.value })}
-              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] px-3 text-sm font-medium text-[var(--navy)] outline-none focus:border-[var(--field)]"
+              className="mt-2 h-10 w-full rounded-md border border-[var(--line)] bg-white px-3 text-sm font-medium text-[var(--navy)] outline-none transition-colors focus:border-[var(--field)]"
               aria-label="Sort products"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -412,30 +425,33 @@ export function CatalogControls({
         </aside>
       </div>
 
-      {/* Mobile filter sheet */}
       <AnimatePresence>
         {open ? (
           <div className="fixed inset-0 z-[70] lg:hidden">
             <motion.button
               type="button"
               aria-label="Close filters"
-              className="absolute inset-0 bg-black/45"
+              className="absolute inset-0 bg-black/40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={sheetTransition}
               onClick={() => setOpen(false)}
             />
             <motion.div
               role="dialog"
               aria-modal="true"
               aria-labelledby="filters-title"
-              className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-xl bg-white shadow-xl"
+              className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-xl bg-white shadow-[0_-8px_32px_rgba(18,24,32,0.12)]"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              transition={sheetTransition}
             >
-              <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3">
+              <div className="flex justify-center pt-2.5">
+                <span className="h-1 w-10 rounded-full bg-[var(--line)]" aria-hidden />
+              </div>
+              <div className="flex items-center justify-between px-4 pb-3 pt-2">
                 <div>
                   <h2
                     id="filters-title"
@@ -443,20 +459,24 @@ export function CatalogControls({
                   >
                     Filters
                   </h2>
-                  <p className="text-xs text-[var(--ink-muted)]">
-                    {resultCount} part{resultCount === 1 ? "" : "s"} match
+                  <p className="mt-0.5 text-xs text-[var(--ink-muted)]">
+                    <span className="tabular-nums font-medium text-[var(--navy)]">
+                      {resultCount}
+                    </span>
+                    {" "}
+                    part{resultCount === 1 ? "" : "s"} match
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--line)]"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--line)] text-[var(--navy)] transition-colors hover:border-[var(--field)]/35"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="flex-1 overflow-y-auto border-t border-[var(--line)] px-4 py-1">
                 <FilterPanel
                   categories={categories}
                   brands={brands}
@@ -467,7 +487,7 @@ export function CatalogControls({
                 <button
                   type="button"
                   onClick={() => clearFilters()}
-                  className="h-11 flex-1 rounded-md border border-[var(--line)] text-sm font-semibold text-[var(--navy)]"
+                  className="h-11 flex-1 rounded-md border border-[var(--line)] text-sm font-semibold text-[var(--navy)] transition-colors hover:border-[var(--field)]/35"
                 >
                   Clear
                 </button>

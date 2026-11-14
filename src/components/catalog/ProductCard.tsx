@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { formatMoney, stockLabel } from "@/lib/format";
 import { useGarage } from "@/lib/garage/store";
 import { productFitsVehicle } from "@/lib/vehicles";
+import { ProductImageFrame } from "@/components/product/ProductImageFrame";
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
   const vehicle = useGarage((s) => s.vehicle);
@@ -14,19 +14,15 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
 
   return (
     <article className="group overflow-hidden rounded-lg border border-[var(--line)] bg-white transition-colors hover:border-[var(--field)]/40">
-      <Link
-        href={`/p/${product.slug}`}
-        className="relative block aspect-[5/4] overflow-hidden bg-[var(--surface-muted)]"
-      >
-        {image ? (
-          <Image
-            src={image.url}
-            alt={image.alt}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        ) : null}
+      <Link href={`/p/${product.slug}`} className="relative block">
+        <ProductImageFrame
+          src={image?.url}
+          alt={image?.alt || product.title}
+          variant="card"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="aspect-[5/4]"
+          imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+        />
         {fits && (
           <span className="absolute left-2 top-2 rounded-md bg-[var(--field)] px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white">
             Fits your vehicle

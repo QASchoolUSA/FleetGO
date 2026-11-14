@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { motion } from "motion/react";
 import { cn } from "@/lib/format";
+import { ProductImageFrame } from "./ProductImageFrame";
 
 export function ProductGallery({
   images,
@@ -21,24 +20,15 @@ export function ProductGallery({
 
   return (
     <div>
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--surface-muted)]">
-        <motion.div
-          key={current.url}
-          initial={{ opacity: 0.35 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0"
-        >
-          <Image
-            src={current.url}
-            alt={current.alt || title}
-            fill
-            priority
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        </motion.div>
-      </div>
+      <ProductImageFrame
+        src={current.url}
+        alt={current.alt || title}
+        variant="gallery"
+        priority
+        fadeKey={current.url}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="aspect-square rounded-xl"
+      />
       {images.length > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto">
           {images.map((img, index) => (
@@ -51,7 +41,13 @@ export function ProductGallery({
                 index === active ? "border-[var(--field)]" : "border-[var(--line)]",
               )}
             >
-              <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />
+              <ProductImageFrame
+                src={img.url}
+                alt=""
+                variant="thumb"
+                sizes="64px"
+                className="absolute inset-0"
+              />
             </button>
           ))}
         </div>

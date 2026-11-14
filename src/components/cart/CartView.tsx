@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatMoney } from "@/lib/format";
+import { ProductImageFrame } from "@/components/product/ProductImageFrame";
 
 export function CartView() {
   const items = useCart((s) => s.items);
@@ -30,11 +30,13 @@ export function CartView() {
       <ul className="divide-y divide-[var(--line)] rounded-lg border border-[var(--line)]">
         {items.map((item) => (
           <li key={item.productId} className="flex gap-4 p-4">
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-[var(--surface-muted)]">
-              {item.image ? (
-                <Image src={item.image} alt="" fill className="object-cover" sizes="96px" />
-              ) : null}
-            </div>
+            <ProductImageFrame
+              src={item.image}
+              alt=""
+              variant="cart"
+              sizes="96px"
+              className="h-24 w-24 shrink-0 rounded-md"
+            />
             <div className="min-w-0 flex-1">
               <Link href={`/p/${item.slug}`} className="font-medium text-[var(--navy)] hover:underline">
                 {item.title}

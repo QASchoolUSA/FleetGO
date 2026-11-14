@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart/store";
 import { formatMoney } from "@/lib/format";
+import { ProductImageFrame } from "@/components/product/ProductImageFrame";
 
 export function CartDrawer() {
   const isOpen = useCart((s) => s.isOpen);
@@ -60,11 +60,13 @@ export function CartDrawer() {
                 <ul className="space-y-4">
                   {items.map((item) => (
                     <li key={item.productId} className="flex gap-3 border-b border-[var(--line)] pb-4">
-                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-[var(--surface-muted)]">
-                        {item.image ? (
-                          <Image src={item.image} alt="" fill className="object-cover" sizes="80px" />
-                        ) : null}
-                      </div>
+                      <ProductImageFrame
+                        src={item.image}
+                        alt=""
+                        variant="cart"
+                        sizes="80px"
+                        className="h-20 w-20 shrink-0 rounded-md"
+                      />
                       <div className="min-w-0 flex-1">
                         <Link
                           href={`/p/${item.slug}`}

@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import type { CatalogCategory } from "@/lib/catalog/types";
 
 export function FeaturedCategories({ categories }: { categories: CatalogCategory[] }) {
@@ -13,31 +13,33 @@ export function FeaturedCategories({ categories }: { categories: CatalogCategory
           Navigate like a parts counter — brakes to Class 8 air systems, without the maze.
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+      <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-4">
         {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/c/${cat.slug}`}
-            className="group relative aspect-[5/4] overflow-hidden rounded-xl"
-          >
-            {cat.image ? (
-              <Image
-                src={cat.image}
-                alt=""
-                fill
-                className="object-cover transition duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-[var(--field)]" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-            <span className="absolute bottom-3 left-3 right-3 font-[family-name:var(--font-display)] text-lg font-bold uppercase tracking-wide text-white sm:text-xl">
-              {cat.title}
-            </span>
-          </Link>
+          <li key={cat.id} className="bg-[var(--surface)]">
+            <Link
+              href={`/c/${cat.slug}`}
+              className="group flex h-full min-h-[5.5rem] flex-col justify-between gap-3 px-4 py-4 transition hover:bg-[var(--surface-muted)] focus-visible:bg-[var(--surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--field)] sm:min-h-[6.5rem] sm:px-5 sm:py-5"
+            >
+              <span className="font-[family-name:var(--font-display)] text-xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-2xl">
+                {cat.title}
+              </span>
+              <span className="flex items-end justify-between gap-3">
+                {cat.description ? (
+                  <span className="line-clamp-2 text-sm leading-snug text-[var(--ink-muted)]">
+                    {cat.description}
+                  </span>
+                ) : (
+                  <span className="text-sm text-[var(--ink-muted)]">Browse parts</span>
+                )}
+                <ArrowRight
+                  className="mt-0.5 h-4 w-4 shrink-0 text-[var(--field)] transition group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </span>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

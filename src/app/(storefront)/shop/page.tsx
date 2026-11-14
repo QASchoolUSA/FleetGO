@@ -36,14 +36,14 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
         <span className="text-[var(--navy)]">Shop</span>
       </nav>
 
-      <header className="mb-4 border-b border-[var(--line)] pb-4 sm:mb-6">
+      <div className="mb-5 sm:mb-6">
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold uppercase tracking-wide text-[var(--navy)] sm:text-4xl">
           Shop all parts
         </h1>
         <p className="mt-1.5 text-sm font-medium text-[var(--ink-muted)]">
           {products.length} part{products.length === 1 ? "" : "s"} available
         </p>
-      </header>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-8">
         <Suspense fallback={null}>

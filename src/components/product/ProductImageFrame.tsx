@@ -36,7 +36,7 @@ export function ProductImageFrame({
   if (!src) {
     return (
       <div
-        className={cn("relative overflow-hidden bg-[var(--surface-muted)]", className)}
+        className={cn("relative overflow-hidden bg-[var(--surface)]", className)}
       />
     );
   }
@@ -54,7 +54,7 @@ export function ProductImageFrame({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-[var(--surface-muted)]", className)}
+      className={cn("relative overflow-hidden bg-[var(--surface)]", className)}
     >
       {fadeKey ? (
         <motion.div

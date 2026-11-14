@@ -15,7 +15,7 @@ export function ProductGallery({
   const current = images[active] ?? images[0];
 
   if (!current) {
-    return <div className="aspect-square rounded-xl bg-[var(--surface-muted)]" />;
+    return <div className="aspect-square rounded-xl bg-[var(--surface)]" />;
   }
 
   return (

@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
+    "cleanup:categories": "tsx scripts/cleanup-sanity-categories.ts",
+    "fix:categories": "tsx scripts/fix-sanity-categories.ts",
     "export:amazon": "tsx scripts/export-amazon-flatfile.ts",
     "export:google-merchant": "tsx scripts/export-google-merchant-feed.ts",
     "typegen": "sanity schema extract && sanity typegen generate"

@@ -74,13 +74,14 @@ export const productByBarcodeQuery = `*[_type == "product" && barcode == $barcod
   featured
 }`;
 
-export const categoriesQuery = `*[_type == "category"] | order(title asc) {
+export const categoriesQuery = `*[_type == "category" && count(*[_type == "product" && references(^._id)]) > 0] | order(title asc) {
   _id,
   title,
   "slug": slug.current,
   description,
   "image": image.asset->url,
-  "parentSlug": parent->slug.current
+  "parentSlug": parent->slug.current,
+  "productCount": count(*[_type == "product" && references(^._id)])
 }`;
 
 export const categoryBySlugQuery = `*[_type == "category" && slug.current == $slug][0] {
@@ -118,5 +119,5 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0] {
 }`;
 
 export const productSlugsQuery = `*[_type == "product" && defined(slug.current)].slug.current`;
-export const categorySlugsQuery = `*[_type == "category" && defined(slug.current)].slug.current`;
+export const categorySlugsQuery = `*[_type == "category" && defined(slug.current) && count(*[_type == "product" && references(^._id)]) > 0].slug.current`;
 export const brandSlugsQuery = `*[_type == "brand" && defined(slug.current)].slug.current`;

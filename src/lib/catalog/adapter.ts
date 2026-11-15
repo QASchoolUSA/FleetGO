@@ -27,7 +27,14 @@ const sampleAdapter: CatalogAdapter = {
     return sampleProducts.find((p) => p.barcode === barcode) ?? null;
   },
   async getCategories() {
-    return sampleCategories;
+    return sampleCategories
+      .map((cat) => ({
+        ...cat,
+        productCount: sampleProducts.filter((p) =>
+          p.categories.some((c) => c.slug === cat.slug),
+        ).length,
+      }))
+      .filter((cat) => (cat.productCount ?? 0) > 0);
   },
   async getCategoryBySlug(slug) {
     return sampleCategories.find((c) => c.slug === slug) ?? null;

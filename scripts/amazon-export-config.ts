@@ -4,6 +4,8 @@
  * template you download in Seller Central before creating new catalog listings.
  */
 
+import { EXPERT_CATEGORY_TITLES } from "../src/lib/catalog/expertCategories";
+
 export const amazonExportConfig = {
   marketplace: "US",
   currency: "USD",
@@ -38,34 +40,9 @@ export type AmazonProductTypeMapping = {
  * Starter map — productType/templateSheet are placeholders you fill once from
  * Seller Central → Catalog → Add products via upload → Inventory File Template.
  */
-export const categoryProductTypeMap: AmazonProductTypeMapping[] = [
-  { categoryTitle: "Fuel System — Throttle Bodies", productType: "", templateSheet: "" },
-  { categoryTitle: "Fuel System — Fuel Pumps & Modules", productType: "", templateSheet: "" },
-  { categoryTitle: "Steering — Rack & Pinion", productType: "", templateSheet: "" },
-  { categoryTitle: "Steering — Tie Rod Ends", productType: "", templateSheet: "" },
-  { categoryTitle: "Transmission — Filters & Kits", productType: "", templateSheet: "" },
-  { categoryTitle: "Wheel End — Hub Caps", productType: "", templateSheet: "" },
-  { categoryTitle: "Wheel End — Hub Assemblies", productType: "", templateSheet: "" },
-  { categoryTitle: "Driveline — U-Joints", productType: "", templateSheet: "" },
-  { categoryTitle: "Brakes — Rotors", productType: "", templateSheet: "" },
-  { categoryTitle: "Brakes — Hardware Kits", productType: "", templateSheet: "" },
-  { categoryTitle: "Trailer / Towing — Couplers", productType: "", templateSheet: "" },
-  { categoryTitle: "Trailer / Towing — Hitches", productType: "", templateSheet: "" },
-  { categoryTitle: "Trailer / Towing — Electrical", productType: "", templateSheet: "" },
-  { categoryTitle: "Exhaust — Heat Protection", productType: "", templateSheet: "" },
-  { categoryTitle: "HVAC — Control Modules", productType: "", templateSheet: "" },
-  { categoryTitle: "Suspension — Control Arms", productType: "", templateSheet: "" },
-  { categoryTitle: "Suspension — Sway Bar Links", productType: "", templateSheet: "" },
-  { categoryTitle: "Suspension — Trailing Arms", productType: "", templateSheet: "" },
-  { categoryTitle: "Engine — Intake Manifolds", productType: "", templateSheet: "" },
-  { categoryTitle: "Lighting — CHMSL / Third Brake Lights", productType: "", templateSheet: "" },
-  { categoryTitle: "Electrical — Body Control Modules", productType: "", templateSheet: "" },
-  { categoryTitle: "Wipers & Washers — Reservoirs", productType: "", templateSheet: "" },
-  { categoryTitle: "Hydraulics — Hose Couplings / Fittings", productType: "", templateSheet: "" },
-  { categoryTitle: "Hydraulics — Ferrules", productType: "", templateSheet: "" },
-  { categoryTitle: "Emissions — EVAP / Canister Vent Valves", productType: "", templateSheet: "" },
-  { categoryTitle: "Clutch — Hydraulics", productType: "", templateSheet: "" },
-];
+export const categoryProductTypeMap: AmazonProductTypeMapping[] = EXPERT_CATEGORY_TITLES.map(
+  (categoryTitle) => ({ categoryTitle, productType: "", templateSheet: "" }),
+);
 
 export function resolveProductType(categoryTitles: string[]): AmazonProductTypeMapping | null {
   for (const title of categoryTitles) {

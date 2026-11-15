@@ -10,19 +10,14 @@ import { SearchBar } from "@/components/catalog/SearchBar";
 import { VehicleFinder } from "@/components/vehicle/VehicleFinder";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { cn } from "@/lib/format";
+import type { CatalogCategory } from "@/lib/catalog/types";
 
-const nav = [
-  { href: "/c/brakes", label: "Brakes" },
-  { href: "/c/filters", label: "Filters" },
-  { href: "/c/lighting", label: "Lighting" },
-  { href: "/c/electrical", label: "Electrical" },
-  { href: "/c/engine", label: "Engine" },
-  { href: "/c/suspension", label: "Suspension" },
-  { href: "/c/semi-hd", label: "Semi / HD" },
-  { href: "/c/fluids", label: "Fluids" },
-];
+export function Header({ navCategories }: { navCategories: CatalogCategory[] }) {
+  const nav = navCategories.map((cat) => ({
+    href: `/c/${cat.slug}`,
+    label: cat.title,
+  }));
 
-export function Header() {
   const count = useCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
   const openCart = useCart((s) => s.openCart);
   const vehicle = useGarage((s) => s.vehicle);

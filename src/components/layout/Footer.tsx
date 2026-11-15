@@ -1,6 +1,7 @@
 import Link from "next/link";
+import type { CatalogCategory } from "@/lib/catalog/types";
 
-export function Footer() {
+export function Footer({ shopCategories }: { shopCategories: CatalogCategory[] }) {
   return (
     <footer className="mt-auto bg-[var(--field)] text-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-4 md:gap-10">
@@ -15,19 +16,43 @@ export function Footer() {
         <div>
           <h3 className="text-xs font-medium text-white/55">Shop</h3>
           <ul className="mt-3 space-y-2 text-sm text-white/80">
-            <li><Link href="/shop" className="transition-colors hover:text-white">All parts</Link></li>
-            <li><Link href="/c/semi-hd" className="transition-colors hover:text-white">Semi / HD</Link></li>
-            <li><Link href="/c/brakes" className="transition-colors hover:text-white">Brakes</Link></li>
-            <li><Link href="/c/filters" className="transition-colors hover:text-white">Filters</Link></li>
+            <li>
+              <Link href="/shop" className="transition-colors hover:text-white">
+                All parts
+              </Link>
+            </li>
+            {shopCategories.map((cat) => (
+              <li key={cat.id}>
+                <Link href={`/c/${cat.slug}`} className="transition-colors hover:text-white">
+                  {cat.title}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h3 className="text-xs font-medium text-white/55">Help</h3>
           <ul className="mt-3 space-y-2 text-sm text-white/80">
-            <li><Link href="/shipping" className="transition-colors hover:text-white">Shipping</Link></li>
-            <li><Link href="/returns" className="transition-colors hover:text-white">Returns</Link></li>
-            <li><Link href="/contact" className="transition-colors hover:text-white">Contact</Link></li>
-            <li><Link href="/about" className="transition-colors hover:text-white">About FleetGo</Link></li>
+            <li>
+              <Link href="/shipping" className="transition-colors hover:text-white">
+                Shipping
+              </Link>
+            </li>
+            <li>
+              <Link href="/returns" className="transition-colors hover:text-white">
+                Returns
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="transition-colors hover:text-white">
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="transition-colors hover:text-white">
+                About FleetGo
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

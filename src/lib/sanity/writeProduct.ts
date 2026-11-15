@@ -1,3 +1,7 @@
+import {
+  EXPERT_CATEGORY_TITLES,
+  resolveExpertCategoryTitle,
+} from "@/lib/catalog/expertCategories";
 import { sanityWriteClient } from "./client";
 
 type WriteClient = NonNullable<typeof sanityWriteClient>;
@@ -49,19 +53,125 @@ export async function ensureCategory(
   client: WriteClient,
   categoryName?: string | null,
 ): Promise<string | null> {
-  const title = categoryName?.trim();
+  const title = resolveExpertCategoryTitle(categoryName);
   if (!title) return null;
-  // Category strings from barcode APIs can be path-like: "Automotive > Filters"
-  const leaf = title.split(/[>/|,]/).map((s) => s.trim()).filter(Boolean).pop() || title;
-  const slug = slugify(leaf) || "uncategorized";
+  const slug = slugify(title) || "uncategorized";
   const id = `category.${slug}`;
   await client.createOrReplace({
     _id: id,
     _type: "category",
-    title: leaf,
+    title,
     slug: { _type: "slug", current: slug },
   });
   return id;
+}
+
+/** Ensure all expert category documents exist with stable ids. */
+export async function ensureExpertCategories(): Promise<string[]> {
+  if (!sanityWriteClient) {
+    throw new Error("Sanity write client is not configured");
+  }
+  const client = sanityWriteClient;
+  const ids: string[] = [];
+  for (const title of EXPERT_CATEGORY_TITLES) {
+    const slug = slugify(title) || "uncategorized";
+    const id = `category.${slug}`;
+    await client.createOrReplace({
+      _id: id,
+      _type: "category",
+      title,
+      slug: { _type: "slug", current: slug },
+    });
+    ids.push(id);
+  }
+  return ids;
+}
+
+/**
+ * Remap products whose current category title resolves via expert aliases
+ * (short leaves / slash-mangled titles) onto the canonical expert category docs.
+ */
+export async function remapProductsToExpertCategories(): Promise<{
+  remapped: Array<{ id: string; barcode?: string; from: string; to: string }>;
+  unchanged: number;
+}> {
+  if (!sanityWriteClient) {
+    throw new Error("Sanity write client is not configured");
+  }
+  const client = sanityWriteClient;
+  await ensureExpertCategories();
+
+  const products = await client.fetch<
+    Array<{
+      _id: string;
+      barcode?: string;
+      categories?: Array<{ title?: string; slug?: string }>;
+    }>
+  >(`*[_type == "product"]{
+    _id,
+    barcode,
+    "categories": categories[]->{ title, "slug": slug.current }
+  }`);
+
+  const remapped: Array<{ id: string; barcode?: string; from: string; to: string }> = [];
+  let unchanged = 0;
+
+  for (const product of products) {
+    const currentTitle = product.categories?.[0]?.title || "";
+    const resolved = resolveExpertCategoryTitle(currentTitle);
+    if (!resolved) {
+      unchanged += 1;
+      continue;
+    }
+    if (resolved === currentTitle) {
+      unchanged += 1;
+      continue;
+    }
+    const categoryId = `category.${slugify(resolved) || "uncategorized"}`;
+    await client
+      .patch(product._id)
+      .set({
+        categories: [{ _type: "reference", _ref: categoryId, _key: categoryId }],
+      })
+      .commit();
+    remapped.push({
+      id: product._id,
+      barcode: product.barcode,
+      from: currentTitle,
+      to: resolved,
+    });
+  }
+
+  return { remapped, unchanged };
+}
+
+/** Delete Sanity category docs that no products reference. */
+export async function deleteEmptyCategories(): Promise<{
+  deleted: Array<{ id: string; title: string; slug: string }>;
+  kept: number;
+}> {
+  if (!sanityWriteClient) {
+    throw new Error("Sanity write client is not configured");
+  }
+  const client = sanityWriteClient;
+  const rows = await client.fetch<
+    Array<{ _id: string; title: string; slug: string; productCount: number }>
+  >(`*[_type == "category"]{
+    _id,
+    title,
+    "slug": slug.current,
+    "productCount": count(*[_type == "product" && references(^._id)])
+  }`);
+
+  const empty = rows.filter((r) => (r.productCount ?? 0) === 0);
+  const deleted: Array<{ id: string; title: string; slug: string }> = [];
+
+  for (const row of empty) {
+    await client.delete(row._id);
+    deleted.push({ id: row._id, title: row.title, slug: row.slug });
+  }
+
+  return { deleted, kept: rows.length - deleted.length };
 }
 
 const MAX_IMAGE_BYTES = 8_000_000;

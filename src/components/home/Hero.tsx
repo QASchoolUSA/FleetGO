@@ -53,10 +53,10 @@ export function Hero() {
               Shop parts
             </Link>
             <Link
-              href="/c/semi-hd"
+              href="/c/wheel-end-hub-assemblies"
               className="inline-flex h-12 items-center justify-center rounded-md border border-white/35 bg-[var(--navy-deep)]/50 px-6 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:border-white/55 hover:bg-[var(--navy-deep)]/70"
             >
-              Semi / HD
+              Wheel end hubs
             </Link>
           </div>
         </motion.div>

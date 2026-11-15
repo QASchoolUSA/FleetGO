@@ -69,7 +69,15 @@ export const sanityAdapter: CatalogAdapter = {
   async getCategories() {
     if (!sanityClient) return [];
     const docs = await sanityClient.fetch<
-      { _id: string; title: string; slug: string; description?: string; image?: string; parentSlug?: string }[]
+      {
+        _id: string;
+        title: string;
+        slug: string;
+        description?: string;
+        image?: string;
+        parentSlug?: string;
+        productCount?: number;
+      }[]
     >(categoriesQuery);
     return docs.map((d) => ({
       id: d._id,
@@ -78,6 +86,7 @@ export const sanityAdapter: CatalogAdapter = {
       description: d.description,
       image: d.image,
       parentSlug: d.parentSlug,
+      productCount: d.productCount,
     }));
   },
   async getCategoryBySlug(slug) {

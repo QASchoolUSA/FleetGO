@@ -52,6 +52,8 @@ export type CatalogCategory = {
   description?: string;
   image?: string;
   parentSlug?: string;
+  /** Present when loaded from Sanity with a product-count projection. */
+  productCount?: number;
 };
 
 export type CatalogBrand = {

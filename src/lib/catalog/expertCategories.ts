@@ -23,7 +23,13 @@ export const EXPERT_CATEGORY_TITLES = [
   "Suspension — Control Arms",
   "Suspension — Sway Bar Links",
   "Suspension — Trailing Arms",
+  "Suspension — Struts & Shocks",
+  "Suspension — Bushings",
+  "Suspension — Ball Joints",
+  "Steering — Pitman Arms",
   "Engine — Intake Manifolds",
+  "Engine — Mounts",
+  "Transmission — Mounts",
   "Lighting — CHMSL / Third Brake Lights",
   "Electrical — Body Control Modules",
   "Wipers & Washers — Reservoirs",
@@ -31,6 +37,9 @@ export const EXPERT_CATEGORY_TITLES = [
   "Hydraulics — Ferrules",
   "Emissions — EVAP / Canister Vent Valves",
   "Clutch — Hydraulics",
+  "Trailer / Towing — Hitch Balls",
+  "Brakes — Master Cylinders",
+  "Driveline — Differential Components",
 ] as const;
 
 export type ExpertCategoryTitle = (typeof EXPERT_CATEGORY_TITLES)[number];

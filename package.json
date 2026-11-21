@@ -12,6 +12,7 @@
     "fix:categories": "tsx scripts/fix-sanity-categories.ts",
     "export:amazon": "tsx scripts/export-amazon-flatfile.ts",
     "export:google-merchant": "tsx scripts/export-google-merchant-feed.ts",
+    "verify:admin-audit": "tsx scripts/verify-admin-audit.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {

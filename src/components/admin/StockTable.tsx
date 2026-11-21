@@ -31,15 +31,22 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
               className="border-b border-[var(--line)] last:border-0 hover:bg-[var(--surface-muted)]/60"
             >
               <td className="px-3 py-2.5">
-                <Link
-                  href={`/p/${row.slug}`}
-                  className="font-medium text-[var(--navy)] hover:underline"
-                >
-                  {row.title}
-                </Link>
+                {row.slug ? (
+                  <Link
+                    href={`/p/${row.slug}`}
+                    className="font-medium text-[var(--navy)] hover:underline"
+                  >
+                    {row.title}
+                  </Link>
+                ) : (
+                  <span className="font-medium">{row.title}</span>
+                )}
                 <div className="mt-0.5 text-xs text-[var(--ink-muted)]">
                   {row.brand}
                   {row.categories[0] ? ` · ${row.categories[0]}` : ""}
+                  {row.webSyncStatus && row.webSyncStatus !== "published"
+                    ? ` · sync: ${row.webSyncStatus}`
+                    : ""}
                 </div>
               </td>
               <td className="px-3 py-2.5">

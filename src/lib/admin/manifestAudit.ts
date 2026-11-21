@@ -1,14 +1,17 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { CatalogProduct } from "@/lib/catalog/types";
+import type { ConvexAdminProduct } from "./convexCatalog";
 import type {
   AuditSummary,
   CategoryRollup,
   GapRow,
+  InventoryProduct,
   ManifestAuditResult,
   ManifestException,
   ManifestExceptions,
   ManifestLine,
+  PublishIssueRow,
   StockRow,
 } from "./types";
 
@@ -133,26 +136,71 @@ export async function loadManifestExceptions(
   }
 }
 
-function toStockRows(products: CatalogProduct[]): StockRow[] {
+export function catalogToInventory(products: CatalogProduct[]): InventoryProduct[] {
+  return products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    sku: p.sku,
+    mpn: p.mpn,
+    barcode: p.barcode,
+    brand: p.brand,
+    quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
+    stockStatus: p.stockStatus,
+    price: p.price,
+    categories: p.categories.map((c) => c.title),
+    webSyncStatus: "published",
+    webSlug: p.slug,
+  }));
+}
+
+export function convexToInventory(
+  products: ConvexAdminProduct[],
+): InventoryProduct[] {
+  return products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.webSlug,
+    sku: p.mpn || p.barcode,
+    mpn: p.mpn,
+    barcode: p.barcode,
+    brand: p.brand,
+    quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
+    stockStatus:
+      (p.quantity ?? 0) > 0
+        ? "in_stock"
+        : ("out_of_stock" as InventoryProduct["stockStatus"]),
+    price: p.webPriceManual ?? p.webPrice ?? 0,
+    categories: p.category ? [p.category] : [],
+    webSyncStatus: p.webSyncStatus,
+    webSyncError: p.webSyncError,
+    webSlug: p.webSlug,
+    sanityDocumentId: p.sanityDocumentId,
+  }));
+}
+
+function toStockRows(products: InventoryProduct[]): StockRow[] {
   return products
     .map((p) => ({
       id: p.id,
       title: p.title,
-      slug: p.slug,
-      sku: p.sku,
+      slug: p.slug || p.webSlug || "",
+      sku: p.sku || p.mpn || p.barcode || "",
       mpn: p.mpn,
       barcode: p.barcode,
-      brand: p.brand,
+      brand: p.brand || "—",
       quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
-      stockStatus: p.stockStatus,
-      price: p.price,
-      categories: p.categories.map((c) => c.title),
+      stockStatus: p.stockStatus || "in_stock",
+      price: p.price ?? 0,
+      categories: p.categories ?? [],
+      webSyncStatus: p.webSyncStatus,
+      webSyncError: p.webSyncError,
     }))
     .sort((a, b) => b.quantity - a.quantity || a.title.localeCompare(b.title));
 }
 
-function indexByNormalizedMpn(products: CatalogProduct[]) {
-  const map = new Map<string, CatalogProduct[]>();
+function indexByNormalizedMpn(products: InventoryProduct[]) {
+  const map = new Map<string, InventoryProduct[]>();
   for (const p of products) {
     for (const field of [p.mpn, p.sku]) {
       const key = normalizeMpn(field);
@@ -170,6 +218,7 @@ function gapFromLine(
   onHandQty: number,
   barcodes: string[],
   exception?: ManifestException,
+  webSyncStatus?: string,
 ): GapRow {
   const gapQty = Math.max(0, line.qty - onHandQty);
   return {
@@ -186,16 +235,47 @@ function gapFromLine(
     manifestExtRetail: line.extRetail,
     barcodes,
     exceptionNote: exception?.note,
+    webSyncStatus,
   };
+}
+
+function collectPublishIssues(
+  products: InventoryProduct[],
+  convexMeta?: ConvexAdminProduct[],
+): PublishIssueRow[] {
+  const metaById = new Map((convexMeta ?? []).map((p) => [p.id, p]));
+  return products
+    .filter((p) => {
+      const status = p.webSyncStatus || "idle";
+      return status === "failed" || (status !== "published" && !p.sanityDocumentId);
+    })
+    .map((p) => {
+      const meta = metaById.get(p.id);
+      return {
+        id: p.id,
+        title: p.title,
+        barcode: p.barcode || "",
+        mpn: p.mpn,
+        quantity: p.quantity,
+        webSyncStatus: p.webSyncStatus || "idle",
+        webSyncError: p.webSyncError,
+        catalogPhotoCount: meta?.catalogPhotoCount,
+        imageCount: meta?.imageCount,
+        brand: p.brand,
+      };
+    })
+    .sort((a, b) => a.title.localeCompare(b.title));
 }
 
 export function reconcileManifest(
   lines: ManifestLine[],
-  products: CatalogProduct[],
+  products: InventoryProduct[],
   exceptions: ManifestExceptions = {},
+  opts?: { source?: "convex" | "sanity"; convexMeta?: ConvexAdminProduct[] },
 ): ManifestAuditResult {
   const byMpn = indexByNormalizedMpn(products);
   const stock = toStockRows(products);
+  const publishIssues = collectPublishIssues(products, opts?.convexMeta);
 
   const missing: GapRow[] = [];
   const shortfalls: GapRow[] = [];
@@ -207,7 +287,7 @@ export function reconcileManifest(
 
   for (const line of lines) {
     const hitsRaw = byMpn.get(line.normalizedMpn) ?? [];
-    const uniq = new Map<string, CatalogProduct>();
+    const uniq = new Map<string, InventoryProduct>();
     for (const hit of hitsRaw) {
       uniq.set(hit.barcode || hit.id, hit);
     }
@@ -218,9 +298,15 @@ export function reconcileManifest(
     );
     const barcodes = hits.map((p) => p.barcode || "").filter(Boolean);
     const exception = exceptions[line.item];
+    const syncStatus = hits.map((h) => h.webSyncStatus).filter(Boolean)[0];
 
-    if (exception?.status === "physically_received" || exception?.status === "ignored") {
-      acknowledged.push(gapFromLine(line, onHand, barcodes, exception));
+    if (
+      exception?.status === "physically_received" ||
+      exception?.status === "ignored"
+    ) {
+      acknowledged.push(
+        gapFromLine(line, onHand, barcodes, exception, syncStatus),
+      );
       continue;
     }
 
@@ -234,16 +320,23 @@ export function reconcileManifest(
     if (onHand === line.qty) {
       exactMatchSkus += 1;
     } else if (onHand < line.qty) {
-      shortfalls.push(gapFromLine(line, onHand, barcodes, exception));
+      shortfalls.push(
+        gapFromLine(line, onHand, barcodes, exception, syncStatus),
+      );
     } else {
-      overs.push(gapFromLine(line, onHand, barcodes, exception));
+      overs.push(gapFromLine(line, onHand, barcodes, exception, syncStatus));
     }
   }
 
   missing.sort((a, b) => b.gapExtRetail - a.gapExtRetail || b.gapQty - a.gapQty);
-  shortfalls.sort((a, b) => b.gapQty - a.gapQty || b.gapExtRetail - a.gapExtRetail);
+  shortfalls.sort(
+    (a, b) => b.gapQty - a.gapQty || b.gapExtRetail - a.gapExtRetail,
+  );
   acknowledged.sort((a, b) => b.manifestExtRetail - a.manifestExtRetail);
-  overs.sort((a, b) => b.onHandQty - b.manifestQty - (a.onHandQty - a.manifestQty));
+  overs.sort(
+    (a, b) =>
+      b.onHandQty - b.manifestQty - (a.onHandQty - a.manifestQty),
+  );
 
   const missingUnits = missing.reduce((s, r) => s + r.gapQty, 0);
   const missingExt = missing.reduce((s, r) => s + r.gapExtRetail, 0);
@@ -260,6 +353,7 @@ export function reconcileManifest(
   const summary: AuditSummary = {
     generatedAt: new Date().toISOString(),
     lotId: lotIds[0] || "unknown",
+    source: opts?.source ?? "sanity",
     manifestSkus: lines.length,
     manifestUnits,
     manifestExtRetail: round2(manifestExt),
@@ -275,6 +369,7 @@ export function reconcileManifest(
     acknowledgedSkus: acknowledged.length,
     acknowledgedUnits: ackUnits,
     acknowledgedExtRetail: round2(ackExt),
+    publishIssueSkus: publishIssues.length,
     exactMatchSkus,
     overSkus: overs.length,
     overUnits: overs.reduce((s, r) => s + (r.onHandQty - r.manifestQty), 0),
@@ -308,18 +403,20 @@ export function reconcileManifest(
     shortfalls,
     acknowledged,
     overs,
+    publishIssues,
     categoryRollup,
   };
 }
 
 export async function buildManifestAudit(
-  products: CatalogProduct[],
+  products: InventoryProduct[],
+  opts?: { source?: "convex" | "sanity"; convexMeta?: ConvexAdminProduct[] },
 ): Promise<ManifestAuditResult> {
   const [lines, exceptions] = await Promise.all([
     loadManifestLines(),
     loadManifestExceptions(),
   ]);
-  return reconcileManifest(lines, products, exceptions);
+  return reconcileManifest(lines, products, exceptions, opts);
 }
 
 function round2(n: number) {

@@ -7,20 +7,33 @@ import type { ManifestAuditResult } from "@/lib/admin/types";
 import { cn } from "@/lib/format";
 import { GapTable } from "./GapTable";
 import { KpiStrip } from "./KpiStrip";
+import { PublishIssuesTable } from "./PublishIssuesTable";
 import { StockTable } from "./StockTable";
 
-type TabId = "stock" | "missing" | "shortfalls" | "acknowledged";
+type TabId =
+  | "stock"
+  | "missing"
+  | "shortfalls"
+  | "publish"
+  | "acknowledged";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "stock", label: "In stock" },
   { id: "missing", label: "Missing" },
   { id: "shortfalls", label: "Shortfalls" },
+  { id: "publish", label: "Publish issues" },
   { id: "acknowledged", label: "Acknowledged" },
 ];
 
 type SortKey = "retail" | "qty" | "title";
 
-export function InventoryConsole({ audit }: { audit: ManifestAuditResult }) {
+export function InventoryConsole({
+  audit,
+  sourceNote,
+}: {
+  audit: ManifestAuditResult;
+  sourceNote?: string;
+}) {
   const { summary } = audit;
   const reduce = useReducedMotion();
   const [tab, setTab] = useState<TabId>("missing");
@@ -116,10 +129,24 @@ export function InventoryConsole({ audit }: { audit: ManifestAuditResult }) {
     return [...rows].sort((a, b) => b.manifestExtRetail - a.manifestExtRetail);
   }, [audit.acknowledged, q, category]);
 
+  const publishRows = useMemo(() => {
+    let rows = audit.publishIssues;
+    if (q) {
+      rows = rows.filter((r) =>
+        [r.title, r.mpn, r.barcode, r.webSyncError, r.brand]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      );
+    }
+    return rows;
+  }, [audit.publishIssues, q]);
+
   const tabCount: Record<TabId, number> = {
     stock: stockRows.length,
     missing: missingRows.length,
     shortfalls: shortfallRows.length,
+    publish: publishRows.length,
     acknowledged: acknowledgedRows.length,
   };
 
@@ -137,11 +164,20 @@ export function InventoryConsole({ audit }: { audit: ManifestAuditResult }) {
             <p className="mt-1 text-sm text-[var(--ink-muted)]">
               Lot <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">{summary.lotId}</code>
               {" · "}
+              Source{" "}
+              <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">
+                {summary.source}
+                {sourceNote && sourceNote !== summary.source ? ` (${sourceNote})` : ""}
+              </code>
+              {" · "}
               Loaded {new Date(summary.generatedAt).toLocaleString()}
             </p>
           </div>
           <p className="text-sm text-[var(--ink-muted)]">
-            Catalog {summary.stockSkus} SKUs · Manifest {summary.manifestSkus} SKUs
+            Warehouse {summary.stockSkus} SKUs · Manifest {summary.manifestSkus} SKUs
+            {summary.publishIssueSkus > 0
+              ? ` · ${summary.publishIssueSkus} publish issue(s)`
+              : ""}
           </p>
         </div>
       </header>
@@ -149,8 +185,10 @@ export function InventoryConsole({ audit }: { audit: ManifestAuditResult }) {
       <KpiStrip summary={summary} />
 
       <div className="rounded-xl border border-[#f0d7bf] bg-[#fff8f1] px-4 py-3 text-sm text-[#7c2d12]">
-        Gaps are SKUs not in the catalog or below manifest qty. Physically received
-        but unscanned items (e.g. HD brake shoes) appear under{" "}
+        Missing / shortfalls compare the BStock manifest to <strong>Convex</strong>{" "}
+        on-hand inventory (warehouse source of truth).{" "}
+        <strong>Publish issues</strong> are in Convex but not live on the website
+        (Sanity). Physically received but unscanned items appear under{" "}
         <strong>Acknowledged</strong>. Not adjusted for sales.
         {" "}Missing gap {formatMoney(summary.missingExtRetail)} · Shortfall gap{" "}
         {formatMoney(summary.shortfallExtRetail)}.
@@ -235,6 +273,9 @@ export function InventoryConsole({ audit }: { audit: ManifestAuditResult }) {
             ) : null}
             {tab === "shortfalls" ? (
               <GapTable rows={shortfallRows} mode="shortfall" />
+            ) : null}
+            {tab === "publish" ? (
+              <PublishIssuesTable rows={publishRows} />
             ) : null}
             {tab === "acknowledged" ? (
               <GapTable rows={acknowledgedRows} mode="acknowledged" />

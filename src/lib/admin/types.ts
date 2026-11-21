@@ -22,6 +22,25 @@ export type ManifestLine = {
   lotId: string;
 };
 
+/** Inventory row used for warehouse reconciliation (Convex preferred). */
+export type InventoryProduct = {
+  id: string;
+  title: string;
+  slug?: string;
+  sku?: string;
+  mpn?: string;
+  barcode?: string;
+  brand?: string;
+  quantity: number;
+  stockStatus?: string;
+  price?: number;
+  categories?: string[];
+  webSyncStatus?: string;
+  webSyncError?: string;
+  webSlug?: string;
+  sanityDocumentId?: string;
+};
+
 export type StockRow = {
   id: string;
   title: string;
@@ -34,6 +53,8 @@ export type StockRow = {
   stockStatus: string;
   price: number;
   categories: string[];
+  webSyncStatus?: string;
+  webSyncError?: string;
 };
 
 export type GapRow = {
@@ -50,11 +71,26 @@ export type GapRow = {
   manifestExtRetail: number;
   barcodes: string[];
   exceptionNote?: string;
+  webSyncStatus?: string;
+};
+
+export type PublishIssueRow = {
+  id: string;
+  title: string;
+  barcode: string;
+  mpn?: string;
+  quantity: number;
+  webSyncStatus: string;
+  webSyncError?: string;
+  catalogPhotoCount?: number;
+  imageCount?: number;
+  brand?: string;
 };
 
 export type AuditSummary = {
   generatedAt: string;
   lotId: string;
+  source: "convex" | "sanity";
   manifestSkus: number;
   manifestUnits: number;
   manifestExtRetail: number;
@@ -70,6 +106,7 @@ export type AuditSummary = {
   acknowledgedSkus: number;
   acknowledgedUnits: number;
   acknowledgedExtRetail: number;
+  publishIssueSkus: number;
   exactMatchSkus: number;
   overSkus: number;
   overUnits: number;
@@ -93,5 +130,6 @@ export type ManifestAuditResult = {
   shortfalls: GapRow[];
   acknowledged: GapRow[];
   overs: GapRow[];
+  publishIssues: PublishIssueRow[];
   categoryRollup: CategoryRollup[];
 };

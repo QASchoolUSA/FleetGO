@@ -38,8 +38,19 @@ export const EXPERT_CATEGORY_TITLES = [
   "Emissions — EVAP / Canister Vent Valves",
   "Clutch — Hydraulics",
   "Trailer / Towing — Hitch Balls",
+  "Trailer / Towing — Hitch Covers & Accessories",
   "Brakes — Master Cylinders",
   "Driveline — Differential Components",
+  "Ignition — Spark Plugs",
+  "Ignition — Conversion Kits",
+  "Engine — Crankshaft Seals",
+  "Cooling & Heating — Heater Pipes & Hoses",
+  "Body & Hardware — Clips & Retainers",
+  "Body & Hardware — Fasteners & Screws",
+  "Suspension — Air Springs",
+  "Tools & Shop — Hand Tools & Hardware",
+  "Fuel System — Carburetor Rebuild Kits",
+  "Driveline — CV Joint Boot Kits",
 ] as const;
 
 export type ExpertCategoryTitle = (typeof EXPERT_CATEGORY_TITLES)[number];
@@ -58,6 +69,14 @@ export const CATEGORY_ALIASES: Record<string, ExpertCategoryTitle> = {
   "towing couplers": "Trailer / Towing — Couplers",
   "towing hitches": "Trailer / Towing — Hitches",
   "towing electrical": "Trailer / Towing — Electrical",
+  ignition: "Ignition — Spark Plugs",
+  "spark plugs": "Ignition — Spark Plugs",
+  "crankshaft seals": "Engine — Crankshaft Seals",
+  "air springs": "Suspension — Air Springs",
+  "clips & retainers": "Body & Hardware — Clips & Retainers",
+  "fasteners & screws": "Body & Hardware — Fasteners & Screws",
+  "carburetor rebuild kits": "Fuel System — Carburetor Rebuild Kits",
+  "cv joint boot kits": "Driveline — CV Joint Boot Kits",
 };
 
 function normalizeKey(input: string): string {

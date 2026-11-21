@@ -273,6 +273,14 @@ export type QuantityOnlyPayload = {
   contentHash: string;
 };
 
+function truncateOnWord(input: string, max = 160): string {
+  const clean = input.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const slice = clean.slice(0, max - 1);
+  const lastSpace = slice.lastIndexOf(" ");
+  return `${(lastSpace > 80 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
+}
+
 export async function syncInventoryProduct(payload: InventorySyncPayload) {
   if (!sanityWriteClient) {
     throw new Error("Sanity write client is not configured");
@@ -293,9 +301,11 @@ export async function syncInventoryProduct(payload: InventorySyncPayload) {
     throw new Error("Failed to upload any product images to Sanity");
   }
 
-  const shortDescription =
-    payload.description?.trim().slice(0, 160) ||
-    `${payload.brand ? `${payload.brand} ` : ""}${payload.title}`.slice(0, 160);
+  const shortDescription = truncateOnWord(
+    payload.description?.trim() ||
+      `${payload.brand ? `${payload.brand} ` : ""}${payload.title}`,
+    160,
+  );
 
   const doc = {
     _id: autoPublish ? docId : draftId,
@@ -324,18 +334,18 @@ export async function syncInventoryProduct(payload: InventorySyncPayload) {
       engine: row.engine,
       notes: row.notes,
     })),
-    specs: [
-      ...(payload.specs ?? [])
-        .filter((s) => s.label?.trim() && s.value?.trim())
-        .map((s, index) => ({
-          _key: `spec-${index}-${s.label.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)}`,
-          label: s.label.trim(),
-          value: s.value.trim(),
-        })),
-      ...(payload.imageSource
-        ? [{ _key: "spec-imagesource", label: "Image source", value: payload.imageSource }]
-        : []),
-    ],
+    specs: (payload.specs ?? [])
+      .filter(
+        (s) =>
+          s.label?.trim() &&
+          s.value?.trim() &&
+          s.label.trim().toLowerCase() !== "image source",
+      )
+      .map((s, index) => ({
+        _key: `spec-${index}-${s.label.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)}`,
+        label: s.label.trim(),
+        value: s.value.trim(),
+      })),
     stockStatus: stockStatusFromQuantity(payload.quantity),
     quantity: payload.quantity,
     convexProductKey: payload.convexProductKey,

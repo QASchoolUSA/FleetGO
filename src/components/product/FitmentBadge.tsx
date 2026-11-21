@@ -33,7 +33,10 @@ export function FitmentList({ fitment }: { fitment: ProductFitment[] }) {
           >
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-medium text-[var(--navy)]">
-                {f.yearFrom}–{f.yearTo} {f.make} {f.model}
+                {f.yearFrom && f.yearTo && f.yearFrom === f.yearTo
+                  ? f.yearFrom
+                  : `${f.yearFrom}–${f.yearTo}`}{" "}
+                {f.make} {f.model}
               </span>
               {f.engine ? (
                 <span className="text-[var(--ink-muted)]">· {f.engine}</span>

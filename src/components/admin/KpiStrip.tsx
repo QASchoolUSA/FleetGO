@@ -17,11 +17,13 @@ const toneClass: Record<Tone, string> = {
 function Kpi({
   label,
   value,
+  detail,
   tone = "default",
   index,
 }: {
   label: string;
   value: string;
+  detail?: string;
   tone?: Tone;
   index: number;
 }) {
@@ -44,41 +46,60 @@ function Kpi({
       >
         {value}
       </div>
+      {detail ? (
+        <div className="mt-1 text-xs tabular-nums text-[var(--ink-muted)]">
+          {detail}
+        </div>
+      ) : null}
     </motion.div>
   );
 }
 
 export function KpiStrip({ summary }: { summary: AuditSummary }) {
+  const unitGap = Math.max(0, summary.manifestUnits - summary.stockUnits);
+
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
       <Kpi
         index={0}
-        label="Manifest units"
+        label="Manifest total"
         value={summary.manifestUnits.toLocaleString()}
+        detail={`${summary.manifestSkus.toLocaleString()} SKUs`}
       />
       <Kpi
         index={1}
-        label="On-hand units"
+        label="On hand now"
         value={summary.stockUnits.toLocaleString()}
+        detail={`${summary.stockSkus.toLocaleString()} SKUs`}
         tone="field"
       />
       <Kpi
         index={2}
-        label="Missing SKUs"
-        value={String(summary.missingSkus)}
+        label="Unit gap"
+        value={unitGap.toLocaleString()}
+        detail={`${summary.totalGapUnits.toLocaleString()} missing+short`}
         tone="signal"
       />
       <Kpi
         index={3}
-        label="Gap retail"
-        value={formatMoney(summary.totalGapExtRetail)}
-        tone="warn"
+        label="Missing units"
+        value={summary.missingUnits.toLocaleString()}
+        detail={`${summary.missingSkus.toLocaleString()} SKUs`}
+        tone="signal"
       />
       <Kpi
         index={4}
-        label="SKU coverage"
-        value={`${summary.skuCoveragePct}%`}
-        tone={summary.skuCoveragePct >= 70 ? "field" : "warn"}
+        label="Gap retail"
+        value={formatMoney(summary.totalGapExtRetail)}
+        detail={`Short ${summary.shortfallUnits.toLocaleString()} units`}
+        tone="warn"
+      />
+      <Kpi
+        index={5}
+        label="Unit coverage"
+        value={`${summary.unitCoveragePct}%`}
+        detail={`SKU ${summary.skuCoveragePct}%`}
+        tone={summary.unitCoveragePct >= 70 ? "field" : "warn"}
       />
     </div>
   );

@@ -12,6 +12,18 @@ export function GapTable({ rows, mode }: { rows: GapRow[]; mode: Mode }) {
     );
   }
 
+  const totalManifest = rows.reduce((s, r) => s + r.manifestQty, 0);
+  const totalOnHand = rows.reduce((s, r) => s + r.onHandQty, 0);
+  const totalGapQty = rows.reduce(
+    (s, r) => s + (mode === "acknowledged" ? r.manifestQty : r.gapQty),
+    0,
+  );
+  const totalRetail = rows.reduce(
+    (s, r) =>
+      s + (mode === "acknowledged" ? r.manifestExtRetail : r.gapExtRetail),
+    0,
+  );
+
   return (
     <div className="overflow-auto rounded-xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_8px_24px_rgba(18,24,32,0.04)]">
       <table className="w-full min-w-[800px] border-collapse text-sm">
@@ -41,7 +53,7 @@ export function GapTable({ rows, mode }: { rows: GapRow[]; mode: Mode }) {
           {rows.map((row) => (
             <tr
               key={row.item}
-              className="border-b border-[var(--line)] last:border-0 hover:bg-[var(--surface-muted)]/60"
+              className="border-b border-[var(--line)] hover:bg-[var(--surface-muted)]/60"
             >
               <td className="px-3 py-2.5">
                 <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">
@@ -89,6 +101,34 @@ export function GapTable({ rows, mode }: { rows: GapRow[]; mode: Mode }) {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr className="border-t-2 border-[var(--line)] bg-[#f8fafc] font-semibold">
+            <td className="px-3 py-3" colSpan={3}>
+              Total · {rows.length.toLocaleString()} SKUs
+            </td>
+            {mode === "shortfall" ? (
+              <>
+                <td className="px-3 py-3 text-right tabular-nums">
+                  {totalManifest.toLocaleString()}
+                </td>
+                <td className="px-3 py-3 text-right tabular-nums">
+                  {totalOnHand.toLocaleString()}
+                </td>
+                <td className="px-3 py-3 text-right tabular-nums text-[var(--signal)]">
+                  {totalGapQty.toLocaleString()}
+                </td>
+              </>
+            ) : (
+              <td className="px-3 py-3 text-right tabular-nums">
+                {totalGapQty.toLocaleString()}
+              </td>
+            )}
+            <td className="px-3 py-3 text-right tabular-nums text-[var(--signal)]">
+              {formatMoney(totalRetail)}
+            </td>
+            {mode === "acknowledged" ? <td className="px-3 py-3" /> : null}
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

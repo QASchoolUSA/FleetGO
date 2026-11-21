@@ -11,6 +11,9 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
     );
   }
 
+  const totalQty = rows.reduce((s, r) => s + r.quantity, 0);
+  const totalExt = rows.reduce((s, r) => s + r.quantity * r.price, 0);
+
   return (
     <div className="overflow-auto rounded-xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_8px_24px_rgba(18,24,32,0.04)]">
       <table className="w-full min-w-[720px] border-collapse text-sm">
@@ -28,7 +31,7 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
           {rows.map((row) => (
             <tr
               key={row.id}
-              className="border-b border-[var(--line)] last:border-0 hover:bg-[var(--surface-muted)]/60"
+              className="border-b border-[var(--line)] hover:bg-[var(--surface-muted)]/60"
             >
               <td className="px-3 py-2.5">
                 {row.slug ? (
@@ -69,6 +72,20 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr className="border-t-2 border-[var(--line)] bg-[#f8fafc] font-semibold">
+            <td className="px-3 py-3" colSpan={3}>
+              Total · {rows.length.toLocaleString()} SKUs
+            </td>
+            <td className="px-3 py-3 text-right tabular-nums">
+              {totalQty.toLocaleString()}
+            </td>
+            <td className="px-3 py-3 text-[var(--ink-muted)]">Ext. value</td>
+            <td className="px-3 py-3 text-right tabular-nums">
+              {formatMoney(totalExt)}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

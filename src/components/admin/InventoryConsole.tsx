@@ -9,6 +9,7 @@ import { GapTable } from "./GapTable";
 import { KpiStrip } from "./KpiStrip";
 import { PublishIssuesTable } from "./PublishIssuesTable";
 import { StockTable } from "./StockTable";
+import { TabTotals } from "./TabTotals";
 
 type TabId =
   | "stock"
@@ -142,12 +143,46 @@ export function InventoryConsole({
     return rows;
   }, [audit.publishIssues, q]);
 
-  const tabCount: Record<TabId, number> = {
-    stock: stockRows.length,
-    missing: missingRows.length,
-    shortfalls: shortfallRows.length,
-    publish: publishRows.length,
-    acknowledged: acknowledgedRows.length,
+  const stockTotals = useMemo(() => {
+    const units = stockRows.reduce((s, r) => s + r.quantity, 0);
+    const retail = stockRows.reduce((s, r) => s + r.quantity * r.price, 0);
+    return { skus: stockRows.length, units, retail };
+  }, [stockRows]);
+
+  const missingTotals = useMemo(() => {
+    const units = missingRows.reduce((s, r) => s + r.gapQty, 0);
+    const retail = missingRows.reduce((s, r) => s + r.gapExtRetail, 0);
+    return { skus: missingRows.length, units, retail };
+  }, [missingRows]);
+
+  const shortfallTotals = useMemo(() => {
+    const units = shortfallRows.reduce((s, r) => s + r.gapQty, 0);
+    const retail = shortfallRows.reduce((s, r) => s + r.gapExtRetail, 0);
+    const manifest = shortfallRows.reduce((s, r) => s + r.manifestQty, 0);
+    const onHand = shortfallRows.reduce((s, r) => s + r.onHandQty, 0);
+    return { skus: shortfallRows.length, units, retail, manifest, onHand };
+  }, [shortfallRows]);
+
+  const acknowledgedTotals = useMemo(() => {
+    const units = acknowledgedRows.reduce((s, r) => s + r.manifestQty, 0);
+    const retail = acknowledgedRows.reduce((s, r) => s + r.manifestExtRetail, 0);
+    return { skus: acknowledgedRows.length, units, retail };
+  }, [acknowledgedRows]);
+
+  const publishTotals = useMemo(() => {
+    const units = publishRows.reduce((s, r) => s + r.quantity, 0);
+    return { skus: publishRows.length, units };
+  }, [publishRows]);
+
+  const tabMeta: Record<TabId, { skus: number; units: number }> = {
+    stock: { skus: stockTotals.skus, units: stockTotals.units },
+    missing: { skus: missingTotals.skus, units: missingTotals.units },
+    shortfalls: { skus: shortfallTotals.skus, units: shortfallTotals.units },
+    publish: { skus: publishTotals.skus, units: publishTotals.units },
+    acknowledged: {
+      skus: acknowledgedTotals.skus,
+      units: acknowledgedTotals.units,
+    },
   };
 
   return (
@@ -173,12 +208,21 @@ export function InventoryConsole({
               Loaded {new Date(summary.generatedAt).toLocaleString()}
             </p>
           </div>
-          <p className="text-sm text-[var(--ink-muted)]">
-            Warehouse {summary.stockSkus} SKUs · Manifest {summary.manifestSkus} SKUs
-            {summary.publishIssueSkus > 0
-              ? ` · ${summary.publishIssueSkus} publish issue(s)`
-              : ""}
-          </p>
+          <div className="text-right text-sm text-[var(--ink-muted)]">
+            <p>
+              <span className="font-medium text-[var(--ink)]">Now</span>{" "}
+              {summary.stockUnits.toLocaleString()} units ·{" "}
+              {summary.stockSkus.toLocaleString()} SKUs
+            </p>
+            <p>
+              <span className="font-medium text-[var(--ink)]">Manifest</span>{" "}
+              {summary.manifestUnits.toLocaleString()} units ·{" "}
+              {summary.manifestSkus.toLocaleString()} SKUs
+            </p>
+            {summary.publishIssueSkus > 0 ? (
+              <p>{summary.publishIssueSkus} publish issue(s)</p>
+            ) : null}
+          </div>
         </div>
       </header>
 
@@ -190,7 +234,9 @@ export function InventoryConsole({
         <strong>Publish issues</strong> are in Convex but not live on the website
         (Sanity). Physically received but unscanned items appear under{" "}
         <strong>Acknowledged</strong>. Not adjusted for sales.
-        {" "}Missing gap {formatMoney(summary.missingExtRetail)} · Shortfall gap{" "}
+        {" "}Now {summary.stockUnits.toLocaleString()} / Manifest{" "}
+        {summary.manifestUnits.toLocaleString()} units · Missing gap{" "}
+        {formatMoney(summary.missingExtRetail)} · Shortfall gap{" "}
         {formatMoney(summary.shortfallExtRetail)}.
       </div>
 
@@ -222,7 +268,7 @@ export function InventoryConsole({
                     active ? "text-white/80" : "text-[var(--ink-muted)]",
                   )}
                 >
-                  {tabCount[t.id]}
+                  {tabMeta[t.id].skus} · {tabMeta[t.id].units.toLocaleString()}u
                 </span>
               </button>
             );
@@ -267,18 +313,108 @@ export function InventoryConsole({
             exit={reduce ? undefined : { opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
           >
-            {tab === "stock" ? <StockTable rows={stockRows} /> : null}
+            {tab === "stock" ? (
+              <>
+                <TabTotals
+                  title="In stock totals"
+                  stats={[
+                    { label: "SKUs", value: String(stockTotals.skus) },
+                    {
+                      label: "Units",
+                      value: stockTotals.units.toLocaleString(),
+                    },
+                    {
+                      label: "Ext. value",
+                      value: formatMoney(stockTotals.retail),
+                    },
+                  ]}
+                />
+                <StockTable rows={stockRows} />
+              </>
+            ) : null}
             {tab === "missing" ? (
-              <GapTable rows={missingRows} mode="missing" />
+              <>
+                <TabTotals
+                  title="Missing totals"
+                  stats={[
+                    { label: "SKUs", value: String(missingTotals.skus) },
+                    {
+                      label: "Units",
+                      value: missingTotals.units.toLocaleString(),
+                      emphasize: true,
+                    },
+                    {
+                      label: "Gap retail",
+                      value: formatMoney(missingTotals.retail),
+                      emphasize: true,
+                    },
+                  ]}
+                />
+                <GapTable rows={missingRows} mode="missing" />
+              </>
             ) : null}
             {tab === "shortfalls" ? (
-              <GapTable rows={shortfallRows} mode="shortfall" />
+              <>
+                <TabTotals
+                  title="Shortfall totals"
+                  stats={[
+                    { label: "SKUs", value: String(shortfallTotals.skus) },
+                    {
+                      label: "Manifest",
+                      value: shortfallTotals.manifest.toLocaleString(),
+                    },
+                    {
+                      label: "On hand",
+                      value: shortfallTotals.onHand.toLocaleString(),
+                    },
+                    {
+                      label: "Short",
+                      value: shortfallTotals.units.toLocaleString(),
+                      emphasize: true,
+                    },
+                    {
+                      label: "Gap retail",
+                      value: formatMoney(shortfallTotals.retail),
+                      emphasize: true,
+                    },
+                  ]}
+                />
+                <GapTable rows={shortfallRows} mode="shortfall" />
+              </>
             ) : null}
             {tab === "publish" ? (
-              <PublishIssuesTable rows={publishRows} />
+              <>
+                <TabTotals
+                  title="Publish issue totals"
+                  stats={[
+                    { label: "SKUs", value: String(publishTotals.skus) },
+                    {
+                      label: "Units held",
+                      value: publishTotals.units.toLocaleString(),
+                    },
+                  ]}
+                />
+                <PublishIssuesTable rows={publishRows} />
+              </>
             ) : null}
             {tab === "acknowledged" ? (
-              <GapTable rows={acknowledgedRows} mode="acknowledged" />
+              <>
+                <TabTotals
+                  title="Acknowledged totals"
+                  stats={[
+                    { label: "SKUs", value: String(acknowledgedTotals.skus) },
+                    {
+                      label: "Units",
+                      value: acknowledgedTotals.units.toLocaleString(),
+                    },
+                    {
+                      label: "Ext. retail",
+                      value: formatMoney(acknowledgedTotals.retail),
+                    },
+                  ]}
+                />
+                <GapTable rows={acknowledgedRows} mode="acknowledged" />
+              </>
             ) : null}
           </motion.div>
         </AnimatePresence>
@@ -303,7 +439,7 @@ export function InventoryConsole({
                 {audit.categoryRollup.map((row) => (
                   <tr
                     key={row.category}
-                    className="border-b border-[var(--line)] last:border-0"
+                    className="border-b border-[var(--line)]"
                   >
                     <td className="px-3 py-2.5">{row.category}</td>
                     <td className="px-3 py-2.5 text-right tabular-nums">
@@ -318,6 +454,24 @@ export function InventoryConsole({
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-[var(--line)] bg-[#f8fafc] font-semibold">
+                  <td className="px-3 py-3">Total</td>
+                  <td className="px-3 py-3 text-right tabular-nums">
+                    {audit.categoryRollup.reduce((s, r) => s + r.skus, 0)}
+                  </td>
+                  <td className="px-3 py-3 text-right tabular-nums">
+                    {audit.categoryRollup
+                      .reduce((s, r) => s + r.qty, 0)
+                      .toLocaleString()}
+                  </td>
+                  <td className="px-3 py-3 text-right tabular-nums">
+                    {formatMoney(
+                      audit.categoryRollup.reduce((s, r) => s + r.ext, 0),
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </section>

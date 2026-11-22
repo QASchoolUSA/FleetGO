@@ -5,6 +5,7 @@ import type { ConvexAdminProduct } from "./convexCatalog";
 import type {
   AuditSummary,
   CategoryRollup,
+  GapMatch,
   GapRow,
   InventoryProduct,
   ManifestAuditResult,
@@ -199,9 +200,31 @@ export function convexToInventory(
     sanityDocumentId: p.sanityDocumentId,
     catalogPhotoCount: p.catalogPhotoCount,
     catalogPhotoUrls: p.catalogPhotoUrls ?? [],
+    imageUrls: p.imageUrls ?? [],
     imageCount: p.imageCount,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
+  }));
+}
+
+function photoUrlsForProduct(p: InventoryProduct): string[] {
+  const urls: string[] = [];
+  const seen = new Set<string>();
+  for (const url of [...(p.catalogPhotoUrls ?? []), ...(p.imageUrls ?? [])]) {
+    const trimmed = url?.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    urls.push(trimmed);
+  }
+  return urls;
+}
+
+function matchesFromHits(hits: InventoryProduct[]): GapMatch[] {
+  return hits.map((p) => ({
+    id: p.id,
+    title: p.title,
+    barcode: p.barcode || undefined,
+    photoUrls: photoUrlsForProduct(p),
   }));
 }
 
@@ -325,6 +348,7 @@ function gapFromLine(
     rawOnHandQty?: number;
     packSize?: number;
     locations?: string[];
+    matches?: GapMatch[];
   },
 ): GapRow {
   const gapQty = Math.max(0, line.qty - onHandQty);
@@ -346,6 +370,7 @@ function gapFromLine(
     locations: extra?.locations,
     exceptionNote: exception?.note,
     webSyncStatus,
+    matches: extra?.matches,
   };
 }
 
@@ -490,6 +515,7 @@ export function reconcileManifest(
       ...new Set(hits.map((p) => p.location?.trim() || "").filter(Boolean)),
     ];
     const syncStatus = hits.map((h) => h.webSyncStatus).filter(Boolean)[0];
+    const matches = matchesFromHits(hits);
 
     if (
       exception?.status === "physically_received" ||
@@ -500,6 +526,7 @@ export function reconcileManifest(
           rawOnHandQty: packSize ? rawOnHand : undefined,
           packSize,
           locations,
+          matches,
         }),
       );
       continue;
@@ -520,6 +547,7 @@ export function reconcileManifest(
           rawOnHandQty: packSize ? rawOnHand : undefined,
           packSize,
           locations,
+          matches,
         }),
       );
     } else {
@@ -528,6 +556,7 @@ export function reconcileManifest(
           rawOnHandQty: packSize ? rawOnHand : undefined,
           packSize,
           locations,
+          matches,
         }),
       );
     }

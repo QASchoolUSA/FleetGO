@@ -23,6 +23,8 @@ export type ConvexAdminProduct = {
   catalogPhotoCount: number;
   catalogPhotoUrls?: string[];
   imageCount: number;
+  /** Enrichment / storefront image URLs from Convex `products.images`. */
+  imageUrls?: string[];
   createdAt?: number;
   updatedAt: number;
 };

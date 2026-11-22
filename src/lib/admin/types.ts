@@ -56,6 +56,7 @@ export type InventoryProduct = {
   sanityDocumentId?: string;
   catalogPhotoCount?: number;
   catalogPhotoUrls?: string[];
+  imageUrls?: string[];
   imageCount?: number;
   createdAt?: number;
   updatedAt?: number;
@@ -88,6 +89,14 @@ export type StockRow = {
   manifestItem?: string;
 };
 
+export type GapMatch = {
+  id: string;
+  title: string;
+  barcode?: string;
+  /** Prefer mobile catalog photos, then enrichment images. */
+  photoUrls: string[];
+};
+
 export type GapRow = {
   item: string;
   mpn: string;
@@ -106,6 +115,8 @@ export type GapRow = {
   locations?: string[];
   exceptionNote?: string;
   webSyncStatus?: string;
+  /** Matched Convex products (shortfalls / overs / acknowledged with hits). */
+  matches?: GapMatch[];
 };
 
 export type PublishIssueRow = {

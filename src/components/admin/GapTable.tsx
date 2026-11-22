@@ -1,3 +1,4 @@
+import { MapPin } from "lucide-react";
 import { formatMoney } from "@/lib/format";
 import type { GapRow } from "@/lib/admin/types";
 
@@ -60,8 +61,14 @@ export function GapTable({ rows, mode }: { rows: GapRow[]; mode: Mode }) {
                   {row.item}
                 </code>
               </td>
-              <td className="max-w-[280px] px-3 py-2.5">
+              <td className="max-w-[300px] px-3 py-2.5">
                 <div className="line-clamp-2">{row.description}</div>
+                {mode === "shortfall" && row.locations && row.locations.length > 0 ? (
+                  <div className="mt-1 inline-flex items-center gap-1 text-xs text-[var(--ink-muted)]">
+                    <MapPin className="h-3 w-3 shrink-0 text-[var(--field)]" />
+                    {row.locations.join(" · ")}
+                  </div>
+                ) : null}
               </td>
               <td className="px-3 py-2.5 text-xs text-[var(--ink-muted)]">
                 {row.category}
@@ -72,7 +79,12 @@ export function GapTable({ rows, mode }: { rows: GapRow[]; mode: Mode }) {
                     {row.manifestQty.toLocaleString()}
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums">
-                    {row.onHandQty.toLocaleString()}
+                    <div>{row.onHandQty.toLocaleString()}</div>
+                    {row.packSize && row.rawOnHandQty !== undefined ? (
+                      <div className="text-[11px] text-[var(--ink-muted)]">
+                        {row.rawOnHandQty} × {row.packSize}
+                      </div>
+                    ) : null}
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums font-semibold text-[var(--signal)]">
                     {row.gapQty.toLocaleString()}

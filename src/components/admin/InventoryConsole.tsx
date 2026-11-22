@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { formatMoney } from "@/lib/format";
+import { cn, formatMoney } from "@/lib/format";
 import type { ManifestAuditResult } from "@/lib/admin/types";
-import { cn } from "@/lib/format";
+import { AppOnlyTable } from "./AppOnlyTable";
 import { GapTable } from "./GapTable";
 import { KpiStrip } from "./KpiStrip";
 import { PublishIssuesTable } from "./PublishIssuesTable";
@@ -13,20 +15,22 @@ import { TabTotals } from "./TabTotals";
 
 type TabId =
   | "stock"
+  | "appOnly"
   | "missing"
   | "shortfalls"
-  | "publish"
-  | "acknowledged";
+  | "acknowledged"
+  | "publish";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "stock", label: "In stock" },
+  { id: "appOnly", label: "Manual / App-only" },
   { id: "missing", label: "Missing" },
   { id: "shortfalls", label: "Shortfalls" },
-  { id: "publish", label: "Publish issues" },
   { id: "acknowledged", label: "Acknowledged" },
+  { id: "publish", label: "Publish issues" },
 ];
 
-type SortKey = "retail" | "qty" | "title";
+type SortKey = "retail" | "qty" | "updated" | "title";
 
 export function InventoryConsole({
   audit,
@@ -36,11 +40,15 @@ export function InventoryConsole({
   sourceNote?: string;
 }) {
   const { summary } = audit;
+  const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
   const reduce = useReducedMotion();
-  const [tab, setTab] = useState<TabId>("missing");
+
+  const [tab, setTab] = useState<TabId>("stock");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState<SortKey>("retail");
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [sort, setSort] = useState<SortKey>("updated");
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -53,27 +61,62 @@ export function InventoryConsole({
     return ["all", ...[...set].sort()];
   }, [audit]);
 
+  const locations = useMemo(() => {
+    const set = new Set<string>();
+    for (const row of audit.stock) {
+      if (row.location) set.add(row.location);
+    }
+    return ["all", ...[...set].sort((a, b) => a.localeCompare(b))];
+  }, [audit.stock]);
+
   const q = query.trim().toLowerCase();
 
-  const stockRows = useMemo(() => {
-    let rows = audit.stock;
+  const filterAndSortStock = (rows: typeof audit.stock) => {
+    let next = rows;
     if (q) {
-      rows = rows.filter((r) =>
-        [r.title, r.sku, r.mpn, r.barcode, r.brand]
+      next = next.filter((r) =>
+        [
+          r.title,
+          r.sku,
+          r.mpn,
+          r.barcode,
+          r.brand,
+          r.location,
+          r.description,
+          r.notes,
+          r.manifestItem,
+        ]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q)),
       );
     }
     if (category !== "all") {
-      rows = rows.filter((r) => r.categories.includes(category));
+      next = next.filter((r) => r.categories.includes(category));
     }
-    rows = [...rows].sort((a, b) => {
-      if (sort === "qty") return b.quantity - a.quantity;
-      if (sort === "retail") return b.price - a.price;
+    if (locationFilter !== "all") {
+      next = next.filter((r) => r.location === locationFilter);
+    }
+    return [...next].sort((a, b) => {
+      if (sort === "updated") {
+        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0) || a.title.localeCompare(b.title);
+      }
+      if (sort === "qty") return b.quantity - a.quantity || a.title.localeCompare(b.title);
+      if (sort === "retail") return b.price - a.price || b.quantity - a.quantity;
       return a.title.localeCompare(b.title);
     });
-    return rows;
-  }, [audit.stock, q, category, sort]);
+  };
+
+  const stockRows = useMemo(
+    () => filterAndSortStock(audit.stock),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [audit.stock, q, category, locationFilter, sort],
+  );
+
+  const appOnlyRows = useMemo(
+    () => filterAndSortStock(audit.appOnly),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [audit.appOnly, q, category, locationFilter, sort],
+  );
 
   const missingRows = useMemo(() => {
     let next = audit.missing;
@@ -99,7 +142,7 @@ export function InventoryConsole({
     let next = audit.shortfalls;
     if (q) {
       next = next.filter((r) =>
-        [r.item, r.mpn, r.description, r.category]
+        [r.item, r.mpn, r.description, r.category, ...(r.locations ?? [])]
           .join(" ")
           .toLowerCase()
           .includes(q),
@@ -114,6 +157,7 @@ export function InventoryConsole({
       return b.gapExtRetail - a.gapExtRetail || b.gapQty - a.gapQty;
     });
   }, [audit.shortfalls, q, category, sort]);
+
   const acknowledgedRows = useMemo(() => {
     let rows = audit.acknowledged;
     if (q) {
@@ -149,6 +193,13 @@ export function InventoryConsole({
     return { skus: stockRows.length, units, retail };
   }, [stockRows]);
 
+  const appOnlyTotals = useMemo(() => {
+    const units = appOnlyRows.reduce((s, r) => s + r.quantity, 0);
+    const photos = appOnlyRows.reduce((s, r) => s + r.catalogPhotoCount, 0);
+    const matched = appOnlyRows.filter((r) => Boolean(r.manifestItem)).length;
+    return { skus: appOnlyRows.length, units, photos, matched };
+  }, [appOnlyRows]);
+
   const missingTotals = useMemo(() => {
     const units = missingRows.reduce((s, r) => s + r.gapQty, 0);
     const retail = missingRows.reduce((s, r) => s + r.gapExtRetail, 0);
@@ -176,14 +227,17 @@ export function InventoryConsole({
 
   const tabMeta: Record<TabId, { skus: number; units: number }> = {
     stock: { skus: stockTotals.skus, units: stockTotals.units },
+    appOnly: { skus: appOnlyTotals.skus, units: appOnlyTotals.units },
     missing: { skus: missingTotals.skus, units: missingTotals.units },
     shortfalls: { skus: shortfallTotals.skus, units: shortfallTotals.units },
-    publish: { skus: publishTotals.skus, units: publishTotals.units },
     acknowledged: {
       skus: acknowledgedTotals.skus,
       units: acknowledgedTotals.units,
     },
+    publish: { skus: publishTotals.skus, units: publishTotals.units },
   };
+
+  const isInventoryTab = tab === "stock" || tab === "appOnly";
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
@@ -191,37 +245,67 @@ export function InventoryConsole({
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--field)]">
           Delivery reconciliation
         </p>
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-[var(--navy)] sm:text-4xl">
               Inventory console
             </h1>
-            <p className="mt-1 text-sm text-[var(--ink-muted)]">
-              Lot <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">{summary.lotId}</code>
-              {" · "}
-              Source{" "}
-              <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">
-                {summary.source}
-                {sourceNote && sourceNote !== summary.source ? ` (${sourceNote})` : ""}
-              </code>
-              {" · "}
-              Loaded {new Date(summary.generatedAt).toLocaleString()}
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--ink-muted)]">
+              <span>
+                Lot{" "}
+                <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">
+                  {summary.lotId}
+                </code>
+              </span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    "h-2 w-2 rounded-full",
+                    summary.source === "convex" ? "bg-emerald-500" : "bg-amber-500",
+                  )}
+                />
+                Source{" "}
+                <code className="rounded bg-[#eef5f0] px-1.5 py-0.5 font-mono text-[12px]">
+                  {summary.source}
+                  {sourceNote && sourceNote !== summary.source
+                    ? ` (${sourceNote})`
+                    : ""}
+                </code>
+              </span>
+              <span>·</span>
+              <span>Loaded {new Date(summary.generatedAt).toLocaleString()}</span>
             </p>
           </div>
-          <div className="text-right text-sm text-[var(--ink-muted)]">
-            <p>
-              <span className="font-medium text-[var(--ink)]">Now</span>{" "}
-              {summary.stockUnits.toLocaleString()} units ·{" "}
-              {summary.stockSkus.toLocaleString()} SKUs
-            </p>
-            <p>
-              <span className="font-medium text-[var(--ink)]">Manifest</span>{" "}
-              {summary.manifestUnits.toLocaleString()} units ·{" "}
-              {summary.manifestSkus.toLocaleString()} SKUs
-            </p>
-            {summary.publishIssueSkus > 0 ? (
-              <p>{summary.publishIssueSkus} publish issue(s)</p>
-            ) : null}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="text-right text-sm text-[var(--ink-muted)]">
+              <p>
+                <span className="font-medium text-[var(--ink)]">Now</span>{" "}
+                {summary.stockUnits.toLocaleString()} units ·{" "}
+                {summary.stockSkus.toLocaleString()} SKUs
+              </p>
+              <p>
+                <span className="font-medium text-[var(--ink)]">Manifest</span>{" "}
+                {summary.manifestUnits.toLocaleString()} units ·{" "}
+                {summary.manifestSkus.toLocaleString()} SKUs
+              </p>
+              {summary.publishIssueSkus > 0 ? (
+                <p className="font-medium text-[var(--signal)]">
+                  {summary.publishIssueSkus} publish issue(s)
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => startRefresh(() => router.refresh())}
+              disabled={isRefreshing}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2 text-sm font-medium text-[var(--navy)] shadow-[0_4px_12px_rgba(18,24,32,0.04)] transition hover:bg-[var(--surface-muted)] disabled:opacity-60"
+            >
+              <RefreshCw
+                className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+              />
+              {isRefreshing ? "Syncing…" : "Refresh"}
+            </button>
           </div>
         </div>
       </header>
@@ -229,15 +313,14 @@ export function InventoryConsole({
       <KpiStrip summary={summary} />
 
       <div className="rounded-xl border border-[#f0d7bf] bg-[#fff8f1] px-4 py-3 text-sm text-[#7c2d12]">
-        Missing / shortfalls compare the BStock manifest to <strong>Convex</strong>{" "}
-        on-hand inventory (warehouse source of truth).{" "}
-        <strong>Publish issues</strong> are in Convex but not live on the website
-        (Sanity). Physically received but unscanned items appear under{" "}
-        <strong>Acknowledged</strong>. Not adjusted for sales.
-        {" "}Now {summary.stockUnits.toLocaleString()} / Manifest{" "}
-        {summary.manifestUnits.toLocaleString()} units · Missing gap{" "}
-        {formatMoney(summary.missingExtRetail)} · Shortfall gap{" "}
-        {formatMoney(summary.shortfallExtRetail)}.
+        Reconciliation compares the BStock manifest to live{" "}
+        <strong>Convex</strong> warehouse stock (including pack-size conversions
+        and <strong>{summary.appOnlySkus} Manual / App-only</strong> items).
+        App-only items stay out of <strong>Publish issues</strong>. Physically
+        received unscanned items appear under <strong>Acknowledged</strong>. Not
+        adjusted for sales. Missing gap{" "}
+        <strong>{formatMoney(summary.missingExtRetail)}</strong> · Shortfall gap{" "}
+        <strong>{formatMoney(summary.shortfallExtRetail)}</strong>.
       </div>
 
       <div className="flex flex-col gap-4">
@@ -247,6 +330,7 @@ export function InventoryConsole({
         >
           {TABS.map((t) => {
             const active = tab === t.id;
+            const hasAlert = t.id === "publish" && tabMeta.publish.skus > 0;
             return (
               <button
                 key={t.id}
@@ -265,7 +349,11 @@ export function InventoryConsole({
                 <span
                   className={cn(
                     "ml-2 tabular-nums text-xs",
-                    active ? "text-white/80" : "text-[var(--ink-muted)]",
+                    active
+                      ? "text-white/80"
+                      : hasAlert
+                        ? "font-semibold text-[var(--signal)]"
+                        : "text-[var(--ink-muted)]",
                   )}
                 >
                   {tabMeta[t.id].skus} · {tabMeta[t.id].units.toLocaleString()}u
@@ -280,26 +368,42 @@ export function InventoryConsole({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search title, MPN, Item #, barcode…"
+            placeholder="Search title, MPN, Item #, barcode, location…"
             className="min-w-[220px] flex-1 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm outline-none ring-[var(--focus-ring)] focus:ring-4"
           />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm"
-          >
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c === "all" ? "All categories" : c}
-              </option>
-            ))}
-          </select>
+          {isInventoryTab && locations.length > 1 ? (
+            <select
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              className="max-w-[240px] rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm"
+            >
+              {locations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc === "all" ? "All locations" : loc}
+                </option>
+              ))}
+            </select>
+          ) : null}
+          {!isInventoryTab || tab === "stock" ? (
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm"
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c === "all" ? "All categories" : c}
+                </option>
+              ))}
+            </select>
+          ) : null}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm"
           >
-            <option value="retail">Sort by retail</option>
+            <option value="updated">Sort by recently updated</option>
+            <option value="retail">Sort by retail / price</option>
             <option value="qty">Sort by qty</option>
             <option value="title">Sort by title</option>
           </select>
@@ -330,6 +434,29 @@ export function InventoryConsole({
                   ]}
                 />
                 <StockTable rows={stockRows} />
+              </>
+            ) : null}
+            {tab === "appOnly" ? (
+              <>
+                <TabTotals
+                  title="Manual & app-only inventory"
+                  stats={[
+                    { label: "SKUs", value: String(appOnlyTotals.skus) },
+                    {
+                      label: "Units",
+                      value: appOnlyTotals.units.toLocaleString(),
+                    },
+                    {
+                      label: "Matched to lot",
+                      value: `${appOnlyTotals.matched}/${appOnlyTotals.skus}`,
+                    },
+                    {
+                      label: "Catalog photos",
+                      value: appOnlyTotals.photos.toLocaleString(),
+                    },
+                  ]}
+                />
+                <AppOnlyTable rows={appOnlyRows} />
               </>
             ) : null}
             {tab === "missing" ? (
@@ -382,21 +509,6 @@ export function InventoryConsole({
                 <GapTable rows={shortfallRows} mode="shortfall" />
               </>
             ) : null}
-            {tab === "publish" ? (
-              <>
-                <TabTotals
-                  title="Publish issue totals"
-                  stats={[
-                    { label: "SKUs", value: String(publishTotals.skus) },
-                    {
-                      label: "Units held",
-                      value: publishTotals.units.toLocaleString(),
-                    },
-                  ]}
-                />
-                <PublishIssuesTable rows={publishRows} />
-              </>
-            ) : null}
             {tab === "acknowledged" ? (
               <>
                 <TabTotals
@@ -414,6 +526,21 @@ export function InventoryConsole({
                   ]}
                 />
                 <GapTable rows={acknowledgedRows} mode="acknowledged" />
+              </>
+            ) : null}
+            {tab === "publish" ? (
+              <>
+                <TabTotals
+                  title="Publish issue totals"
+                  stats={[
+                    { label: "SKUs", value: String(publishTotals.skus) },
+                    {
+                      label: "Units held",
+                      value: publishTotals.units.toLocaleString(),
+                    },
+                  ]}
+                />
+                <PublishIssuesTable rows={publishRows} />
               </>
             ) : null}
           </motion.div>

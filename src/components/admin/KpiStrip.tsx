@@ -57,6 +57,10 @@ function Kpi({
 
 export function KpiStrip({ summary }: { summary: AuditSummary }) {
   const unitGap = Math.max(0, summary.manifestUnits - summary.stockUnits);
+  const stockDetail =
+    summary.appOnlySkus > 0
+      ? `${summary.stockSkus.toLocaleString()} SKUs (${summary.appOnlySkus} app-only)`
+      : `${summary.stockSkus.toLocaleString()} SKUs`;
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
@@ -70,14 +74,14 @@ export function KpiStrip({ summary }: { summary: AuditSummary }) {
         index={1}
         label="On hand now"
         value={summary.stockUnits.toLocaleString()}
-        detail={`${summary.stockSkus.toLocaleString()} SKUs`}
+        detail={stockDetail}
         tone="field"
       />
       <Kpi
         index={2}
         label="Unit gap"
-        value={unitGap.toLocaleString()}
-        detail={`${summary.totalGapUnits.toLocaleString()} missing+short`}
+        value={summary.totalGapUnits.toLocaleString()}
+        detail={`${unitGap.toLocaleString()} raw vs manifest`}
         tone="signal"
       />
       <Kpi
@@ -98,7 +102,7 @@ export function KpiStrip({ summary }: { summary: AuditSummary }) {
         index={5}
         label="Unit coverage"
         value={`${summary.unitCoveragePct}%`}
-        detail={`SKU ${summary.skuCoveragePct}%`}
+        detail={`SKU ${summary.skuCoveragePct}% · ${summary.exactMatchSkus} exact`}
         tone={summary.unitCoveragePct >= 70 ? "field" : "warn"}
       />
     </div>

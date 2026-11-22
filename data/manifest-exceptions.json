@@ -2,5 +2,25 @@
   "HDX_GG4707QR": {
     "status": "physically_received",
     "note": "On hand ~319 reman HD brake shoes — not scanned into inventory yet"
+  },
+  "ACD_41-905": {
+    "status": "pack_multiplier",
+    "packSize": 4,
+    "note": "Counted as 4-piece packs in Convex (1 pack = 4 manifest spark plugs)"
+  },
+  "WVE_ST307NC-100": {
+    "status": "pack_multiplier",
+    "packSize": 100,
+    "note": "Counted as 100-piece packs in Convex (1 pack = 100 manifest connector housings)"
+  },
+  "WVE_ST30RD-25": {
+    "status": "pack_multiplier",
+    "packSize": 25,
+    "note": "Counted as 25-piece packs in Convex (1 pack = 25 manifest bullet terminals)"
+  },
+  "HEL_5528-4": {
+    "status": "alias",
+    "matchBarcodes": ["0025964110206"],
+    "note": "Barcode lookup saved UPC as MPN — matched via barcode 0025964110206"
   }
 }

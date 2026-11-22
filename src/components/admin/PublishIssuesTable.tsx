@@ -4,7 +4,9 @@ export function PublishIssuesTable({ rows }: { rows: PublishIssueRow[] }) {
   if (rows.length === 0) {
     return (
       <p className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-10 text-center text-sm text-[var(--ink-muted)]">
-        No publish failures — every Convex SKU is on the website or still queued.
+        No publish failures — every website-bound Convex SKU is live on Sanity.
+        Manual &amp; app-only items are tracked separately under{" "}
+        <strong>Manual / App-only</strong>.
       </p>
     );
   }

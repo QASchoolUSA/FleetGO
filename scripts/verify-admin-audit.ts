@@ -34,24 +34,35 @@ async function main() {
     JSON.stringify(
       {
         source: s.source,
+        lot: s.lotId,
         stockSkus: s.stockSkus,
         stockUnits: s.stockUnits,
+        appOnlySkus: s.appOnlySkus,
+        appOnlyUnits: s.appOnlyUnits,
+        noBarcodeSkus: s.noBarcodeSkus,
+        unrecognizedBarcodeSkus: s.unrecognizedBarcodeSkus,
+        locatedSkus: s.locatedSkus,
+        matchedSkus: s.matchedSkus,
+        exactMatchSkus: s.exactMatchSkus,
         missingSkus: s.missingSkus,
         missingUnits: s.missingUnits,
+        missingExtRetail: s.missingExtRetail,
         shortfallSkus: s.shortfallSkus,
         shortfallUnits: s.shortfallUnits,
+        shortfallExtRetail: s.shortfallExtRetail,
+        totalGapUnits: s.totalGapUnits,
+        totalGapExtRetail: s.totalGapExtRetail,
+        skuCoveragePct: s.skuCoveragePct,
+        unitCoveragePct: s.unitCoveragePct,
         acknowledgedSkus: s.acknowledgedSkus,
         publishIssueSkus: s.publishIssueSkus,
-        publishIssues: audit.publishIssues.map((p) => ({
-          mpn: p.mpn,
-          title: p.title,
-          status: p.webSyncStatus,
-          error: p.webSyncError,
+        appOnlySample: audit.appOnly.slice(0, 3).map((r) => ({
+          title: r.title,
+          mpn: r.mpn,
+          manifestItem: r.manifestItem,
+          location: r.location,
+          photos: r.catalogPhotoUrls.length,
         })),
-        sparkMissing: audit.missing.some((r) => r.item === "ACD_41-905"),
-        sparkShort: audit.shortfalls.some((r) => r.item === "ACD_41-905"),
-        sparkStock: audit.stock.some((r) => r.mpn === "41-905"),
-        lot: s.lotId,
       },
       null,
       2,
@@ -61,13 +72,30 @@ async function main() {
   if (s.source !== "convex") {
     throw new Error("expected convex source");
   }
-  if (audit.missing.some((r) => r.item === "ACD_41-905")) {
-    throw new Error("ACD_41-905 should not be missing after publish");
+  if (s.publishIssueSkus !== 0) {
+    throw new Error(`expected 0 publish issues, got ${s.publishIssueSkus}`);
   }
-  if (!audit.stock.some((r) => r.mpn === "41-905")) {
-    throw new Error("41-905 should appear in stock");
+  if (s.appOnlySkus < 12) {
+    throw new Error(`expected >= 12 app-only SKUs, got ${s.appOnlySkus}`);
   }
-  // brake shoes still acknowledged
+  for (const item of [
+    "ACD_41-905",
+    "AAG_CPA2324",
+    "AVV_AP11146",
+    "AAG_CSA2022",
+    "WVE_ST30RD-25",
+    "WVE_ST307NC-100",
+    "HEL_5528-4",
+  ]) {
+    if (audit.missing.some((r) => r.item === item)) {
+      throw new Error(`${item} should not be missing`);
+    }
+  }
+  for (const exactItem of ["ACD_41-905", "WVE_ST307NC-100", "WVE_ST30RD-25"]) {
+    if (audit.shortfalls.some((r) => r.item === exactItem)) {
+      throw new Error(`${exactItem} should be exact match via pack_multiplier`);
+    }
+  }
   if (s.acknowledgedSkus !== 1) {
     throw new Error(`expected 1 acknowledged, got ${s.acknowledgedSkus}`);
   }

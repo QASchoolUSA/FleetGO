@@ -36,6 +36,18 @@ function splitItem(item: string): { brandCode: string; mpn: string } {
   return { brandCode: "", mpn: item };
 }
 
+function isLocalOnlyProduct(p: {
+  skipWebsiteSync?: boolean;
+  webSyncStatus?: string;
+  isNoBarcode?: boolean;
+}): boolean {
+  return (
+    p.skipWebsiteSync === true ||
+    p.webSyncStatus === "local_only" ||
+    p.isNoBarcode === true
+  );
+}
+
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -118,18 +130,14 @@ export function parseManifestCsv(text: string): ManifestLine[] {
   });
 }
 
-export async function loadManifestLines(
-  filePath = DEFAULT_MANIFEST,
-): Promise<ManifestLine[]> {
-  const text = await readFile(filePath, "utf8");
+export async function loadManifestLines(): Promise<ManifestLine[]> {
+  const text = await readFile(DEFAULT_MANIFEST, "utf8");
   return parseManifestCsv(text);
 }
 
-export async function loadManifestExceptions(
-  filePath = DEFAULT_EXCEPTIONS,
-): Promise<ManifestExceptions> {
+export async function loadManifestExceptions(): Promise<ManifestExceptions> {
   try {
-    const text = await readFile(filePath, "utf8");
+    const text = await readFile(DEFAULT_EXCEPTIONS, "utf8");
     return JSON.parse(text) as ManifestExceptions;
   } catch {
     return {};
@@ -149,8 +157,13 @@ export function catalogToInventory(products: CatalogProduct[]): InventoryProduct
     stockStatus: p.stockStatus,
     price: p.price,
     categories: p.categories.map((c) => c.title),
+    skipWebsiteSync: false,
+    isNoBarcode: false,
+    isUnrecognizedBarcode: false,
     webSyncStatus: "published",
     webSlug: p.slug,
+    catalogPhotoCount: 0,
+    catalogPhotoUrls: [],
   }));
 }
 
@@ -165,6 +178,11 @@ export function convexToInventory(
     mpn: p.mpn,
     barcode: p.barcode,
     brand: p.brand,
+    description: p.description,
+    notes: p.notes,
+    location: p.location,
+    containerKind: p.containerKind,
+    provider: p.provider,
     quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
     stockStatus:
       (p.quantity ?? 0) > 0
@@ -172,45 +190,129 @@ export function convexToInventory(
         : ("out_of_stock" as InventoryProduct["stockStatus"]),
     price: p.webPriceManual ?? p.webPrice ?? 0,
     categories: p.category ? [p.category] : [],
+    skipWebsiteSync: p.skipWebsiteSync,
+    isNoBarcode: p.isNoBarcode,
+    isUnrecognizedBarcode: p.isUnrecognizedBarcode,
     webSyncStatus: p.webSyncStatus,
     webSyncError: p.webSyncError,
     webSlug: p.webSlug,
     sanityDocumentId: p.sanityDocumentId,
+    catalogPhotoCount: p.catalogPhotoCount,
+    catalogPhotoUrls: p.catalogPhotoUrls ?? [],
+    imageCount: p.imageCount,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
   }));
 }
 
-function toStockRows(products: InventoryProduct[]): StockRow[] {
+function toStockRows(
+  products: InventoryProduct[],
+  manifestByProductId: Map<string, string>,
+): StockRow[] {
   return products
-    .map((p) => ({
-      id: p.id,
-      title: p.title,
-      slug: p.slug || p.webSlug || "",
-      sku: p.sku || p.mpn || p.barcode || "",
-      mpn: p.mpn,
-      barcode: p.barcode,
-      brand: p.brand || "—",
-      quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
-      stockStatus: p.stockStatus || "in_stock",
-      price: p.price ?? 0,
-      categories: p.categories ?? [],
-      webSyncStatus: p.webSyncStatus,
-      webSyncError: p.webSyncError,
-    }))
+    .map((p) => {
+      const localOnly = isLocalOnlyProduct(p);
+      return {
+        id: p.id,
+        title: p.title,
+        slug: p.slug || p.webSlug || "",
+        sku: p.sku || p.mpn || p.barcode || "",
+        mpn: p.mpn,
+        barcode: p.barcode,
+        brand: p.brand?.trim() || "—",
+        description: p.description?.trim() || undefined,
+        notes: p.notes?.trim() || undefined,
+        location: p.location?.trim() || undefined,
+        containerKind: p.containerKind,
+        quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
+        stockStatus: p.stockStatus || "in_stock",
+        price: p.price ?? 0,
+        categories: p.categories ?? [],
+        isLocalOnly: localOnly,
+        isNoBarcode: Boolean(p.isNoBarcode),
+        isUnrecognizedBarcode: Boolean(p.isUnrecognizedBarcode),
+        webSyncStatus: p.webSyncStatus,
+        webSyncError: p.webSyncError,
+        catalogPhotoCount: p.catalogPhotoCount ?? 0,
+        catalogPhotoUrls: p.catalogPhotoUrls ?? [],
+        updatedAt: p.updatedAt,
+        manifestItem: manifestByProductId.get(p.id),
+      };
+    })
     .sort((a, b) => b.quantity - a.quantity || a.title.localeCompare(b.title));
+}
+
+function addToMap<T>(map: Map<string, T[]>, key: string, value: T) {
+  if (!key) return;
+  const list = map.get(key) ?? [];
+  list.push(value);
+  map.set(key, list);
+}
+
+/**
+ * Extract MPN keys for a product: exact MPN/SKU plus brand-prefixed suffix
+ * (e.g. "AUV-AP11146" -> "AP11146", "DW-K6339" -> "K6339").
+ */
+function mpnKeysForProduct(p: InventoryProduct): string[] {
+  const keys = new Set<string>();
+  for (const field of [p.mpn, p.sku]) {
+    if (!field) continue;
+    const norm = normalizeMpn(field);
+    if (norm) keys.add(norm);
+    const trimmed = field.trim();
+    const prefixMatch = trimmed.match(/^[A-Za-z]{2,4}[-_]([A-Za-z0-9][A-Za-z0-9-]{3,})$/);
+    if (prefixMatch?.[1]) {
+      const suffixNorm = normalizeMpn(prefixMatch[1]);
+      if (suffixNorm.length >= 4) keys.add(suffixNorm);
+    }
+  }
+  return [...keys];
 }
 
 function indexByNormalizedMpn(products: InventoryProduct[]) {
   const map = new Map<string, InventoryProduct[]>();
   for (const p of products) {
-    for (const field of [p.mpn, p.sku]) {
-      const key = normalizeMpn(field);
-      if (!key) continue;
-      const list = map.get(key) ?? [];
-      list.push(p);
-      map.set(key, list);
+    for (const key of mpnKeysForProduct(p)) {
+      addToMap(map, key, p);
     }
   }
   return map;
+}
+
+function indexByBarcode(products: InventoryProduct[]) {
+  const map = new Map<string, InventoryProduct[]>();
+  for (const p of products) {
+    const key = normalizeMpn(p.barcode);
+    if (key) addToMap(map, key, p);
+  }
+  return map;
+}
+
+/**
+ * Extract normalized alphanumeric tokens from free text (title, description, notes)
+ * so manual / lookup items whose MPN was written into title or description
+ * (e.g. "Carquest CPA2324", "Part Number ST30RD25", "CSA2022") still reconcile.
+ */
+function extractTextTokens(p: InventoryProduct): Set<string> {
+  const tokens = new Set<string>();
+  const combined = [p.title, p.description, p.notes].filter(Boolean).join(" ");
+  if (!combined) return tokens;
+
+  for (const raw of combined.split(/[\s,;:()[\]{}/\\|]+/)) {
+    const norm = normalizeMpn(raw);
+    if (norm.length >= 5 && /[A-Z]/.test(norm) && /\d/.test(norm)) {
+      tokens.add(norm);
+    }
+  }
+  return tokens;
+}
+
+function isSafeTokenMpn(normalizedMpn: string): boolean {
+  return (
+    normalizedMpn.length >= 5 &&
+    /[A-Z]/.test(normalizedMpn) &&
+    /\d/.test(normalizedMpn)
+  );
 }
 
 function gapFromLine(
@@ -219,6 +321,11 @@ function gapFromLine(
   barcodes: string[],
   exception?: ManifestException,
   webSyncStatus?: string,
+  extra?: {
+    rawOnHandQty?: number;
+    packSize?: number;
+    locations?: string[];
+  },
 ): GapRow {
   const gapQty = Math.max(0, line.qty - onHandQty);
   return {
@@ -229,11 +336,14 @@ function gapFromLine(
     sellerCategory: line.sellerCategory,
     manifestQty: line.qty,
     onHandQty,
+    rawOnHandQty: extra?.rawOnHandQty,
+    packSize: extra?.packSize,
     gapQty,
     unitRetail: line.unitRetail,
     gapExtRetail: gapQty * line.unitRetail,
     manifestExtRetail: line.extRetail,
     barcodes,
+    locations: extra?.locations,
     exceptionNote: exception?.note,
     webSyncStatus,
   };
@@ -246,6 +356,8 @@ function collectPublishIssues(
   const metaById = new Map((convexMeta ?? []).map((p) => [p.id, p]));
   return products
     .filter((p) => {
+      // Intentionally app-only / manual items never publish to Sanity — not a failure.
+      if (isLocalOnlyProduct(p)) return false;
       const status = p.webSyncStatus || "idle";
       return status === "failed" || (status !== "published" && !p.sanityDocumentId);
     })
@@ -259,8 +371,8 @@ function collectPublishIssues(
         quantity: p.quantity,
         webSyncStatus: p.webSyncStatus || "idle",
         webSyncError: p.webSyncError,
-        catalogPhotoCount: meta?.catalogPhotoCount,
-        imageCount: meta?.imageCount,
+        catalogPhotoCount: meta?.catalogPhotoCount ?? p.catalogPhotoCount,
+        imageCount: meta?.imageCount ?? p.imageCount,
         brand: p.brand,
       };
     })
@@ -274,8 +386,81 @@ export function reconcileManifest(
   opts?: { source?: "convex" | "sanity"; convexMeta?: ConvexAdminProduct[] },
 ): ManifestAuditResult {
   const byMpn = indexByNormalizedMpn(products);
-  const stock = toStockRows(products);
+  const byBarcode = indexByBarcode(products);
   const publishIssues = collectPublishIssues(products, opts?.convexMeta);
+
+  // Pass 1: direct MPN / SKU / explicit exception alias matching
+  const lineHits = new Map<string, InventoryProduct[]>();
+  const matchedProductIds = new Set<string>();
+  const manifestByProductId = new Map<string, string>();
+
+  const dedupeHits = (raw: InventoryProduct[]) => {
+    const uniq = new Map<string, InventoryProduct>();
+    for (const hit of raw) {
+      uniq.set(hit.barcode || hit.id, hit);
+    }
+    return [...uniq.values()];
+  };
+
+  for (const line of lines) {
+    const exception = exceptions[line.item];
+    const hitsRaw: InventoryProduct[] = [
+      ...(byMpn.get(line.normalizedMpn) ?? []),
+    ];
+
+    if (exception?.matchBarcodes) {
+      for (const bc of exception.matchBarcodes) {
+        hitsRaw.push(...(byBarcode.get(normalizeMpn(bc)) ?? []));
+      }
+    }
+    if (exception?.matchMpns) {
+      for (const aliasMpn of exception.matchMpns) {
+        hitsRaw.push(...(byMpn.get(normalizeMpn(aliasMpn)) ?? []));
+      }
+    }
+
+    const hits = dedupeHits(hitsRaw);
+    if (hits.length > 0) {
+      lineHits.set(line.item, hits);
+      for (const h of hits) {
+        matchedProductIds.add(h.id);
+        if (!manifestByProductId.has(h.id)) {
+          manifestByProductId.set(h.id, line.item);
+        }
+      }
+    }
+  }
+
+  // Pass 2: fallback token match in title/description/notes for unmatched products
+  const unmatchedProducts = products.filter((p) => !matchedProductIds.has(p.id));
+  if (unmatchedProducts.length > 0) {
+    const tokenIndex = new Map<string, InventoryProduct[]>();
+    for (const p of unmatchedProducts) {
+      for (const token of extractTextTokens(p)) {
+        addToMap(tokenIndex, token, p);
+      }
+    }
+
+    for (const line of lines) {
+      if (lineHits.has(line.item)) continue;
+      if (!isSafeTokenMpn(line.normalizedMpn)) continue;
+      const fallbackHits = dedupeHits(tokenIndex.get(line.normalizedMpn) ?? []);
+      if (fallbackHits.length > 0) {
+        lineHits.set(line.item, fallbackHits);
+        for (const h of fallbackHits) {
+          matchedProductIds.add(h.id);
+          if (!manifestByProductId.has(h.id)) {
+            manifestByProductId.set(h.id, line.item);
+          }
+        }
+      }
+    }
+  }
+
+  const stock = toStockRows(products, manifestByProductId);
+  const appOnly = stock
+    .filter((row) => row.isLocalOnly)
+    .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0) || a.title.localeCompare(b.title));
 
   const missing: GapRow[] = [];
   const shortfalls: GapRow[] = [];
@@ -286,18 +471,24 @@ export function reconcileManifest(
   let matchedOnHand = 0;
 
   for (const line of lines) {
-    const hitsRaw = byMpn.get(line.normalizedMpn) ?? [];
-    const uniq = new Map<string, InventoryProduct>();
-    for (const hit of hitsRaw) {
-      uniq.set(hit.barcode || hit.id, hit);
-    }
-    const hits = [...uniq.values()];
-    const onHand = hits.reduce(
+    const hits = lineHits.get(line.item) ?? [];
+    const rawOnHand = hits.reduce(
       (sum, p) => sum + Math.max(0, Math.floor(p.quantity ?? 0)),
       0,
     );
-    const barcodes = hits.map((p) => p.barcode || "").filter(Boolean);
     const exception = exceptions[line.item];
+    const packSize =
+      exception?.status === "pack_multiplier" &&
+      typeof exception.packSize === "number" &&
+      exception.packSize > 1
+        ? Math.floor(exception.packSize)
+        : undefined;
+    const onHand = packSize ? rawOnHand * packSize : rawOnHand;
+
+    const barcodes = hits.map((p) => p.barcode || "").filter(Boolean);
+    const locations = [
+      ...new Set(hits.map((p) => p.location?.trim() || "").filter(Boolean)),
+    ];
     const syncStatus = hits.map((h) => h.webSyncStatus).filter(Boolean)[0];
 
     if (
@@ -305,7 +496,11 @@ export function reconcileManifest(
       exception?.status === "ignored"
     ) {
       acknowledged.push(
-        gapFromLine(line, onHand, barcodes, exception, syncStatus),
+        gapFromLine(line, onHand, barcodes, exception, syncStatus, {
+          rawOnHandQty: packSize ? rawOnHand : undefined,
+          packSize,
+          locations,
+        }),
       );
       continue;
     }
@@ -321,10 +516,20 @@ export function reconcileManifest(
       exactMatchSkus += 1;
     } else if (onHand < line.qty) {
       shortfalls.push(
-        gapFromLine(line, onHand, barcodes, exception, syncStatus),
+        gapFromLine(line, onHand, barcodes, exception, syncStatus, {
+          rawOnHandQty: packSize ? rawOnHand : undefined,
+          packSize,
+          locations,
+        }),
       );
     } else {
-      overs.push(gapFromLine(line, onHand, barcodes, exception, syncStatus));
+      overs.push(
+        gapFromLine(line, onHand, barcodes, exception, syncStatus, {
+          rawOnHandQty: packSize ? rawOnHand : undefined,
+          packSize,
+          locations,
+        }),
+      );
     }
   }
 
@@ -347,6 +552,13 @@ export function reconcileManifest(
 
   const lotIds = [...new Set(lines.map((l) => l.lotId).filter(Boolean))];
   const stockUnits = stock.reduce((s, r) => s + r.quantity, 0);
+  const appOnlyUnits = appOnly.reduce((s, r) => s + r.quantity, 0);
+  const noBarcodeSkus = appOnly.filter((r) => r.isNoBarcode).length;
+  const unrecognizedBarcodeSkus = appOnly.filter(
+    (r) => !r.isNoBarcode && r.isUnrecognizedBarcode,
+  ).length;
+  const locatedSkus = stock.filter((r) => Boolean(r.location)).length;
+
   const manifestUnits = lines.reduce((s, r) => s + r.qty, 0);
   const manifestExt = lines.reduce((s, r) => s + r.extRetail, 0);
 
@@ -359,6 +571,11 @@ export function reconcileManifest(
     manifestExtRetail: round2(manifestExt),
     stockSkus: stock.length,
     stockUnits,
+    appOnlySkus: appOnly.length,
+    appOnlyUnits,
+    noBarcodeSkus,
+    unrecognizedBarcodeSkus,
+    locatedSkus,
     matchedSkus,
     missingSkus: missing.length,
     missingUnits,
@@ -399,6 +616,7 @@ export function reconcileManifest(
   return {
     summary,
     stock,
+    appOnly,
     missing,
     shortfalls,
     acknowledged,

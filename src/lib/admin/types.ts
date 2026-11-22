@@ -1,8 +1,15 @@
-export type ManifestExceptionStatus = "physically_received" | "ignored";
+export type ManifestExceptionStatus =
+  | "physically_received"
+  | "ignored"
+  | "pack_multiplier"
+  | "alias";
 
 export type ManifestException = {
   status: ManifestExceptionStatus;
   note?: string;
+  packSize?: number;
+  matchBarcodes?: string[];
+  matchMpns?: string[];
 };
 
 export type ManifestExceptions = Record<string, ManifestException>;
@@ -31,14 +38,27 @@ export type InventoryProduct = {
   mpn?: string;
   barcode?: string;
   brand?: string;
+  description?: string;
+  notes?: string;
+  location?: string;
+  containerKind?: string;
+  provider?: string;
   quantity: number;
   stockStatus?: string;
   price?: number;
   categories?: string[];
+  skipWebsiteSync?: boolean;
+  isNoBarcode?: boolean;
+  isUnrecognizedBarcode?: boolean;
   webSyncStatus?: string;
   webSyncError?: string;
   webSlug?: string;
   sanityDocumentId?: string;
+  catalogPhotoCount?: number;
+  catalogPhotoUrls?: string[];
+  imageCount?: number;
+  createdAt?: number;
+  updatedAt?: number;
 };
 
 export type StockRow = {
@@ -49,12 +69,23 @@ export type StockRow = {
   mpn?: string;
   barcode?: string;
   brand: string;
+  description?: string;
+  notes?: string;
+  location?: string;
+  containerKind?: string;
   quantity: number;
   stockStatus: string;
   price: number;
   categories: string[];
+  isLocalOnly: boolean;
+  isNoBarcode: boolean;
+  isUnrecognizedBarcode: boolean;
   webSyncStatus?: string;
   webSyncError?: string;
+  catalogPhotoCount: number;
+  catalogPhotoUrls: string[];
+  updatedAt?: number;
+  manifestItem?: string;
 };
 
 export type GapRow = {
@@ -65,11 +96,14 @@ export type GapRow = {
   sellerCategory: string;
   manifestQty: number;
   onHandQty: number;
+  rawOnHandQty?: number;
+  packSize?: number;
   gapQty: number;
   unitRetail: number;
   gapExtRetail: number;
   manifestExtRetail: number;
   barcodes: string[];
+  locations?: string[];
   exceptionNote?: string;
   webSyncStatus?: string;
 };
@@ -96,6 +130,11 @@ export type AuditSummary = {
   manifestExtRetail: number;
   stockSkus: number;
   stockUnits: number;
+  appOnlySkus: number;
+  appOnlyUnits: number;
+  noBarcodeSkus: number;
+  unrecognizedBarcodeSkus: number;
+  locatedSkus: number;
   matchedSkus: number;
   missingSkus: number;
   missingUnits: number;
@@ -126,6 +165,7 @@ export type CategoryRollup = {
 export type ManifestAuditResult = {
   summary: AuditSummary;
   stock: StockRow[];
+  appOnly: StockRow[];
   missing: GapRow[];
   shortfalls: GapRow[];
   acknowledged: GapRow[];

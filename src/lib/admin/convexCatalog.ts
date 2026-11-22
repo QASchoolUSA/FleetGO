@@ -5,7 +5,15 @@ export type ConvexAdminProduct = {
   title: string;
   brand?: string;
   category?: string;
+  description?: string;
+  notes?: string;
+  location?: string;
+  containerKind?: string;
+  provider?: string;
   quantity: number;
+  skipWebsiteSync?: boolean;
+  isNoBarcode?: boolean;
+  isUnrecognizedBarcode?: boolean;
   webSyncStatus: string;
   webSyncError?: string;
   webSlug?: string;
@@ -13,7 +21,9 @@ export type ConvexAdminProduct = {
   webPrice?: number;
   webPriceManual?: number;
   catalogPhotoCount: number;
+  catalogPhotoUrls?: string[];
   imageCount: number;
+  createdAt?: number;
   updatedAt: number;
 };
 

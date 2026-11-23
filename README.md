@@ -34,7 +34,7 @@ See [`.env.example`](.env.example):
 | `NEXT_PUBLIC_SANITY_*` | Sanity project / dataset |
 | `SANITY_API_READ_TOKEN` / `WRITE_TOKEN` | Optional until you connect Sanity |
 | `SANITY_REVALIDATE_SECRET` | On-demand revalidation webhook |
-| `INVENTORY_SYNC_SECRET` | Shared Bearer secret for `POST /api/inventory/sync` from Convex |
+| `INVENTORY_SYNC_SECRET` | Shared Bearer secret for `POST /api/inventory/sync` and `GET /api/inventory/audit` from Convex |
 | `AUTO_PUBLISH` | Optional; default publish live (set `false` for Sanity drafts) |
 | `GOOGLE_MERCHANT_FEED_SECRET` | Auth for `GET /api/feeds/google-merchant` (Merchant Center scheduled fetch) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |

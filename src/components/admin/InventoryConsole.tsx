@@ -16,6 +16,8 @@ import { TabTotals } from "./TabTotals";
 type TabId =
   | "stock"
   | "appOnly"
+  | "dataGaps"
+  | "unmatched"
   | "missing"
   | "shortfalls"
   | "acknowledged"
@@ -24,6 +26,8 @@ type TabId =
 const TABS: { id: TabId; label: string }[] = [
   { id: "stock", label: "In stock" },
   { id: "appOnly", label: "Manual / App-only" },
+  { id: "dataGaps", label: "Data gaps" },
+  { id: "unmatched", label: "Unmatched live" },
   { id: "missing", label: "Missing" },
   { id: "shortfalls", label: "Shortfalls" },
   { id: "acknowledged", label: "Acknowledged" },
@@ -118,6 +122,18 @@ export function InventoryConsole({
     [audit.appOnly, q, category, locationFilter, sort],
   );
 
+  const dataGapRows = useMemo(
+    () => filterAndSortStock(audit.dataGaps),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [audit.dataGaps, q, category, locationFilter, sort],
+  );
+
+  const unmatchedRows = useMemo(
+    () => filterAndSortStock(audit.unmatchedLive),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [audit.unmatchedLive, q, category, locationFilter, sort],
+  );
+
   const missingRows = useMemo(() => {
     let next = audit.missing;
     if (q) {
@@ -200,6 +216,31 @@ export function InventoryConsole({
     return { skus: appOnlyRows.length, units, photos, matched };
   }, [appOnlyRows]);
 
+  const dataGapTotals = useMemo(() => {
+    const units = dataGapRows.reduce((s, r) => s + r.quantity, 0);
+    const noPrice = dataGapRows.filter((r) => r.price <= 0).length;
+    const noSpecs = dataGapRows.filter((r) => r.specsCount <= 0).length;
+    const noDesc = dataGapRows.filter((r) => !r.hasDescription).length;
+    const noFitment = dataGapRows.filter((r) => r.fitmentCount <= 0).length;
+    return {
+      skus: dataGapRows.length,
+      units,
+      noPrice,
+      noSpecs,
+      noDesc,
+      noFitment,
+    };
+  }, [dataGapRows]);
+
+  const unmatchedTotals = useMemo(() => {
+    const units = unmatchedRows.reduce((s, r) => s + r.quantity, 0);
+    const retail = unmatchedRows.reduce(
+      (s, r) => s + r.quantity * r.price,
+      0,
+    );
+    return { skus: unmatchedRows.length, units, retail };
+  }, [unmatchedRows]);
+
   const missingTotals = useMemo(() => {
     const units = missingRows.reduce((s, r) => s + r.gapQty, 0);
     const retail = missingRows.reduce((s, r) => s + r.gapExtRetail, 0);
@@ -228,6 +269,8 @@ export function InventoryConsole({
   const tabMeta: Record<TabId, { skus: number; units: number }> = {
     stock: { skus: stockTotals.skus, units: stockTotals.units },
     appOnly: { skus: appOnlyTotals.skus, units: appOnlyTotals.units },
+    dataGaps: { skus: dataGapTotals.skus, units: dataGapTotals.units },
+    unmatched: { skus: unmatchedTotals.skus, units: unmatchedTotals.units },
     missing: { skus: missingTotals.skus, units: missingTotals.units },
     shortfalls: { skus: shortfallTotals.skus, units: shortfallTotals.units },
     acknowledged: {
@@ -237,7 +280,11 @@ export function InventoryConsole({
     publish: { skus: publishTotals.skus, units: publishTotals.units },
   };
 
-  const isInventoryTab = tab === "stock" || tab === "appOnly";
+  const isInventoryTab =
+    tab === "stock" ||
+    tab === "appOnly" ||
+    tab === "dataGaps" ||
+    tab === "unmatched";
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
@@ -313,14 +360,37 @@ export function InventoryConsole({
       <KpiStrip summary={summary} />
 
       <div className="rounded-xl border border-[#f0d7bf] bg-[#fff8f1] px-4 py-3 text-sm text-[#7c2d12]">
-        Reconciliation compares the BStock manifest to live{" "}
-        <strong>Convex</strong> warehouse stock (including pack-size conversions
-        and <strong>{summary.appOnlySkus} Manual / App-only</strong> items).
-        App-only items stay out of <strong>Publish issues</strong>. Physically
-        received unscanned items appear under <strong>Acknowledged</strong>. Not
-        adjusted for sales. Missing gap{" "}
-        <strong>{formatMoney(summary.missingExtRetail)}</strong> · Shortfall gap{" "}
-        <strong>{formatMoney(summary.shortfallExtRetail)}</strong>.
+        Live <strong>Convex</strong> stock vs B-Stock lot{" "}
+        <code className="rounded bg-white/70 px-1 font-mono text-[12px]">
+          {summary.lotId}
+        </code>
+        :{" "}
+        <strong>
+          {summary.matchedSkus}/{summary.manifestSkus} SKUs matched
+        </strong>{" "}
+        ({summary.skuCoveragePct}% SKU · {summary.unitCoveragePct}% units).
+        Reconciled qty gap{" "}
+        <strong>
+          {summary.totalGapUnits.toLocaleString()} units ·{" "}
+          {formatMoney(summary.totalGapExtRetail)}
+        </strong>{" "}
+        (missing {summary.missingUnits.toLocaleString()} + shortfall{" "}
+        {summary.shortfallUnits.toLocaleString()}).{" "}
+        {summary.unmatchedLiveSkus > 0 ? (
+          <>
+            <strong>{summary.unmatchedLiveSkus} live SKUs</strong> have no
+            manifest line.{" "}
+          </>
+        ) : null}
+        {summary.dataGapSkus > 0 ? (
+          <>
+            <strong>{summary.dataGapSkus}</strong> need price/description/specs.{" "}
+          </>
+        ) : (
+          <>Catalog text/price complete on live SKUs. </>
+        )}
+        Manual / app-only: <strong>{summary.appOnlySkus}</strong>. Not adjusted
+        for sales.
       </div>
 
       <div className="flex flex-col gap-4">
@@ -433,7 +503,7 @@ export function InventoryConsole({
                     },
                   ]}
                 />
-                <StockTable rows={stockRows} />
+                <StockTable rows={stockRows} showQtyGap />
               </>
             ) : null}
             {tab === "appOnly" ? (
@@ -457,6 +527,60 @@ export function InventoryConsole({
                   ]}
                 />
                 <AppOnlyTable rows={appOnlyRows} />
+              </>
+            ) : null}
+            {tab === "dataGaps" ? (
+              <>
+                <TabTotals
+                  title="Data gap totals"
+                  stats={[
+                    { label: "SKUs", value: String(dataGapTotals.skus) },
+                    {
+                      label: "Units",
+                      value: dataGapTotals.units.toLocaleString(),
+                    },
+                    {
+                      label: "No price / desc",
+                      value: `${dataGapTotals.noPrice} / ${dataGapTotals.noDesc}`,
+                      emphasize:
+                        dataGapTotals.noPrice > 0 || dataGapTotals.noDesc > 0,
+                    },
+                    {
+                      label: "No specs",
+                      value: String(dataGapTotals.noSpecs),
+                      emphasize: dataGapTotals.noSpecs > 0,
+                    },
+                  ]}
+                />
+                <p className="mb-3 text-sm text-[var(--ink-muted)]">
+                  Live Convex SKUs missing sell price, description, or specs.
+                  Empty fitment alone is not a gap (universal hardware). Qty vs
+                  lot is under Missing / Shortfalls.
+                </p>
+                <StockTable rows={dataGapRows} showQtyGap />
+              </>
+            ) : null}
+            {tab === "unmatched" ? (
+              <>
+                <TabTotals
+                  title="Unmatched live inventory"
+                  stats={[
+                    { label: "SKUs", value: String(unmatchedTotals.skus) },
+                    {
+                      label: "Units",
+                      value: unmatchedTotals.units.toLocaleString(),
+                    },
+                    {
+                      label: "Ext. value",
+                      value: formatMoney(unmatchedTotals.retail),
+                    },
+                  ]}
+                />
+                <p className="mb-3 text-sm text-[var(--ink-muted)]">
+                  On hand in Convex but no B-Stock Item # match (wrong/missing
+                  MPN, alias needed, or not on this lot).
+                </p>
+                <StockTable rows={unmatchedRows} />
               </>
             ) : null}
             {tab === "missing" ? (

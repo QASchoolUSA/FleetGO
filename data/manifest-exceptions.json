@@ -22,5 +22,10 @@
     "status": "alias",
     "matchBarcodes": ["0025964110206"],
     "note": "Barcode lookup saved UPC as MPN — matched via barcode 0025964110206"
+  },
+  "CQB_87840": {
+    "status": "alias",
+    "matchMpns": ["878840"],
+    "note": "Manifest Item # truncated vs packaging MPN 878840 (Carquest Premium Air Filter)"
   }
 }

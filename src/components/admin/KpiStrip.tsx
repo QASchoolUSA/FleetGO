@@ -56,7 +56,7 @@ function Kpi({
 }
 
 export function KpiStrip({ summary }: { summary: AuditSummary }) {
-  const unitGap = Math.max(0, summary.manifestUnits - summary.stockUnits);
+  const rawUnitGap = Math.max(0, summary.manifestUnits - summary.stockUnits);
   const stockDetail =
     summary.appOnlySkus > 0
       ? `${summary.stockSkus.toLocaleString()} SKUs (${summary.appOnlySkus} app-only)`
@@ -79,30 +79,30 @@ export function KpiStrip({ summary }: { summary: AuditSummary }) {
       />
       <Kpi
         index={2}
-        label="Unit gap"
+        label="Reconciled gap"
         value={summary.totalGapUnits.toLocaleString()}
-        detail={`${unitGap.toLocaleString()} raw vs manifest`}
+        detail={`Raw Δ ${rawUnitGap.toLocaleString()} · miss ${summary.missingUnits} + short ${summary.shortfallUnits}`}
         tone="signal"
       />
       <Kpi
         index={3}
-        label="Missing units"
-        value={summary.missingUnits.toLocaleString()}
-        detail={`${summary.missingSkus.toLocaleString()} SKUs`}
+        label="Missing SKUs"
+        value={summary.missingSkus.toLocaleString()}
+        detail={`${summary.missingUnits.toLocaleString()} units · ${formatMoney(summary.missingExtRetail)}`}
         tone="signal"
       />
       <Kpi
         index={4}
         label="Gap retail"
         value={formatMoney(summary.totalGapExtRetail)}
-        detail={`Short ${summary.shortfallUnits.toLocaleString()} units`}
+        detail={`Shortfalls ${summary.shortfallSkus} SKUs · unmatched live ${summary.unmatchedLiveSkus}`}
         tone="warn"
       />
       <Kpi
         index={5}
         label="Unit coverage"
         value={`${summary.unitCoveragePct}%`}
-        detail={`SKU ${summary.skuCoveragePct}% · ${summary.exactMatchSkus} exact`}
+        detail={`SKU ${summary.skuCoveragePct}% · ${summary.exactMatchSkus} exact · data gaps ${summary.dataGapSkus}`}
         tone={summary.unitCoveragePct >= 70 ? "field" : "warn"}
       />
     </div>

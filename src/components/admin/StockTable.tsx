@@ -14,11 +14,52 @@ const CONTAINER_LABELS: Record<string, string> = {
   floorLoose: "Floor loose",
 };
 
+function DataBadges({ row }: { row: StockRow }) {
+  const chips: Array<{ label: string; ok: boolean }> = [
+    { label: row.price > 0 ? "Price" : "No price", ok: row.price > 0 },
+    {
+      label: row.hasDescription ? "Desc" : "No desc",
+      ok: row.hasDescription,
+    },
+    {
+      label: row.fitmentCount > 0 ? `Fit ${row.fitmentCount}` : "No fitment",
+      ok: row.fitmentCount > 0,
+    },
+    {
+      label: row.specsCount > 0 ? `Specs ${row.specsCount}` : "No specs",
+      ok: row.specsCount > 0,
+    },
+  ];
+  return (
+    <span className="inline-flex flex-wrap gap-1">
+      {chips.map((chip) => (
+        <span
+          key={chip.label}
+          className={
+            chip.ok
+              ? "inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-800 ring-1 ring-inset ring-emerald-200"
+              : "inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-900 ring-1 ring-inset ring-amber-200"
+          }
+        >
+          {chip.label}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function SyncBadge({ row }: { row: StockRow }) {
-  if (row.isNoBarcode) {
+  if (row.isLocalOnly && row.isNoBarcode) {
     return (
       <span className="inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-800 ring-1 ring-inset ring-amber-200">
         No barcode · App-only
+      </span>
+    );
+  }
+  if (row.isNoBarcode) {
+    return (
+      <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800 ring-1 ring-inset ring-emerald-200">
+        No barcode · Published
       </span>
     );
   }
@@ -46,7 +87,50 @@ function SyncBadge({ row }: { row: StockRow }) {
   return null;
 }
 
-export function StockTable({ rows }: { rows: StockRow[] }) {
+function QtyCell({
+  row,
+  showQtyGap,
+}: {
+  row: StockRow;
+  showQtyGap?: boolean;
+}) {
+  const delta = row.qtyDelta;
+  const showDelta =
+    showQtyGap &&
+    typeof row.manifestQty === "number" &&
+    typeof delta === "number";
+  return (
+    <div className="text-right">
+      <div className="tabular-nums font-medium">
+        {row.quantity.toLocaleString()}
+      </div>
+      {showDelta ? (
+        <div
+          className={
+            delta < 0
+              ? "text-[11px] tabular-nums font-medium text-[var(--signal)]"
+              : delta > 0
+                ? "text-[11px] tabular-nums text-[var(--field)]"
+                : "text-[11px] tabular-nums text-[var(--ink-muted)]"
+          }
+        >
+          vs lot {row.manifestQty!.toLocaleString()}
+          {delta === 0
+            ? " · exact"
+            : ` · ${delta > 0 ? "+" : ""}${delta.toLocaleString()}`}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function StockTable({
+  rows,
+  showQtyGap = false,
+}: {
+  rows: StockRow[];
+  showQtyGap?: boolean;
+}) {
   const [lightbox, setLightbox] = useState<LightboxState | null>(null);
 
   if (rows.length === 0) {
@@ -68,8 +152,11 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
             <tr className="border-b border-[var(--line)] bg-[#f8fafc] text-left text-[11px] uppercase tracking-[0.08em] text-[var(--ink-muted)]">
               <th className="px-3 py-3 font-semibold">Product</th>
               <th className="px-3 py-3 font-semibold">SKU / MPN</th>
+              <th className="px-3 py-3 font-semibold">Data</th>
               <th className="px-3 py-3 font-semibold">Location</th>
-              <th className="px-3 py-3 text-right font-semibold">Qty</th>
+              <th className="px-3 py-3 text-right font-semibold">
+                {showQtyGap ? "Qty vs lot" : "Qty"}
+              </th>
               <th className="px-3 py-3 font-semibold">Status</th>
               <th className="px-3 py-3 text-right font-semibold">Price</th>
             </tr>
@@ -141,8 +228,20 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
                             </span>
                           ) : null}
                         </div>
-                        {row.isLocalOnly && row.description ? (
-                          <p className="mt-1 line-clamp-1 text-xs text-[var(--ink-muted)]">
+                        {row.manifestDescription ? (
+                          <p className="mt-1 line-clamp-2 text-[11px] text-[var(--ink-muted)]">
+                            <span className="font-medium text-[var(--ink)]">
+                              Manifest:
+                            </span>{" "}
+                            {row.manifestDescription}
+                            {typeof row.manifestUnitRetail === "number" &&
+                            row.manifestUnitRetail > 0
+                              ? ` · retail ${formatMoney(row.manifestUnitRetail)}`
+                              : ""}
+                          </p>
+                        ) : null}
+                        {row.description ? (
+                          <p className="mt-0.5 line-clamp-1 text-xs text-[var(--ink-muted)]">
                             {row.description}
                           </p>
                         ) : null}
@@ -158,6 +257,9 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
                         {row.isNoBarcode ? "No barcode" : row.barcode || "—"}
                       </span>
                     </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <DataBadges row={row} />
                   </td>
                   <td className="px-3 py-2.5 text-xs">
                     {row.location ? (
@@ -176,14 +278,23 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
                       <span className="text-[var(--ink-muted)]">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-right tabular-nums font-medium">
-                    {row.quantity.toLocaleString()}
+                  <td className="px-3 py-2.5">
+                    <QtyCell row={row} showQtyGap={showQtyGap} />
                   </td>
                   <td className="px-3 py-2.5 text-[var(--ink-muted)]">
                     {stockLabel(row.stockStatus)}
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums">
-                    {row.price > 0 ? formatMoney(row.price) : "—"}
+                    <div>
+                      {row.price > 0 ? formatMoney(row.price) : "—"}
+                    </div>
+                    {typeof row.manifestUnitRetail === "number" &&
+                    row.manifestUnitRetail > 0 &&
+                    showQtyGap ? (
+                      <div className="text-[11px] text-[var(--ink-muted)]">
+                        lot {formatMoney(row.manifestUnitRetail)}
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
               );
@@ -191,7 +302,7 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
           </tbody>
           <tfoot>
             <tr className="border-t-2 border-[var(--line)] bg-[#f8fafc] font-semibold">
-              <td className="px-3 py-3" colSpan={3}>
+              <td className="px-3 py-3" colSpan={4}>
                 Total · {rows.length.toLocaleString()} SKUs
               </td>
               <td className="px-3 py-3 text-right tabular-nums">

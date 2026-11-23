@@ -41,12 +41,22 @@ function isLocalOnlyProduct(p: {
   skipWebsiteSync?: boolean;
   webSyncStatus?: string;
   isNoBarcode?: boolean;
+  price?: number;
+  sanityDocumentId?: string;
 }): boolean {
-  return (
-    p.skipWebsiteSync === true ||
-    p.webSyncStatus === "local_only" ||
-    p.isNoBarcode === true
-  );
+  // True stubs / app-only warehouse rows. Published no-barcode items with a
+  // sell price (e.g. CPA2324) are enriched website stock — not Manual.
+  if (p.skipWebsiteSync === true || p.webSyncStatus === "local_only") {
+    return true;
+  }
+  if (p.isNoBarcode === true) {
+    const published =
+      p.webSyncStatus === "published" || Boolean(p.sanityDocumentId);
+    const hasSellPrice = (p.price ?? 0) > 0;
+    if (published && hasSellPrice) return false;
+    return true;
+  }
+  return false;
 }
 
 function parseCsv(text: string): string[][] {
@@ -165,6 +175,10 @@ export function catalogToInventory(products: CatalogProduct[]): InventoryProduct
     webSlug: p.slug,
     catalogPhotoCount: 0,
     catalogPhotoUrls: [],
+    fitmentCount: p.fitment?.length ?? 0,
+    specsCount: p.specs?.length ?? 0,
+    hasDescription: Boolean(p.description?.trim()),
+    storeOfferCount: 0,
   }));
 }
 
@@ -202,6 +216,10 @@ export function convexToInventory(
     catalogPhotoUrls: p.catalogPhotoUrls ?? [],
     imageUrls: p.imageUrls ?? [],
     imageCount: p.imageCount,
+    fitmentCount: p.fitmentCount ?? 0,
+    specsCount: p.specsCount ?? 0,
+    hasDescription: p.hasDescription ?? Boolean(p.description?.trim()),
+    storeOfferCount: p.storeOfferCount ?? 0,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
   }));
@@ -228,13 +246,25 @@ function matchesFromHits(hits: InventoryProduct[]): GapMatch[] {
   }));
 }
 
+type ManifestMatchMeta = {
+  item: string;
+  description: string;
+  unitRetail: number;
+  qty: number;
+};
+
 function toStockRows(
   products: InventoryProduct[],
-  manifestByProductId: Map<string, string>,
+  manifestByProductId: Map<string, ManifestMatchMeta>,
 ): StockRow[] {
   return products
     .map((p) => {
       const localOnly = isLocalOnlyProduct(p);
+      const manifest = manifestByProductId.get(p.id);
+      const quantity = Math.max(0, Math.floor(p.quantity ?? 0));
+      const manifestQty = manifest?.qty;
+      const qtyDelta =
+        typeof manifestQty === "number" ? quantity - manifestQty : undefined;
       return {
         id: p.id,
         title: p.title,
@@ -247,7 +277,7 @@ function toStockRows(
         notes: p.notes?.trim() || undefined,
         location: p.location?.trim() || undefined,
         containerKind: p.containerKind,
-        quantity: Math.max(0, Math.floor(p.quantity ?? 0)),
+        quantity,
         stockStatus: p.stockStatus || "in_stock",
         price: p.price ?? 0,
         categories: p.categories ?? [],
@@ -258,11 +288,29 @@ function toStockRows(
         webSyncError: p.webSyncError,
         catalogPhotoCount: p.catalogPhotoCount ?? 0,
         catalogPhotoUrls: p.catalogPhotoUrls ?? [],
+        fitmentCount: p.fitmentCount ?? 0,
+        specsCount: p.specsCount ?? 0,
+        hasDescription:
+          p.hasDescription ?? Boolean(p.description?.trim()),
+        storeOfferCount: p.storeOfferCount ?? 0,
         updatedAt: p.updatedAt,
-        manifestItem: manifestByProductId.get(p.id),
+        manifestItem: manifest?.item,
+        manifestDescription: manifest?.description,
+        manifestUnitRetail: manifest?.unitRetail,
+        manifestQty,
+        qtyDelta,
       };
     })
     .sort((a, b) => b.quantity - a.quantity || a.title.localeCompare(b.title));
+}
+
+/** Catalog completeness gap: missing sell price, description, or specs. */
+export function isCatalogDataGap(row: {
+  price: number;
+  hasDescription: boolean;
+  specsCount: number;
+}): boolean {
+  return row.price <= 0 || !row.hasDescription || row.specsCount <= 0;
 }
 
 function addToMap<T>(map: Map<string, T[]>, key: string, value: T) {
@@ -417,7 +465,7 @@ export function reconcileManifest(
   // Pass 1: direct MPN / SKU / explicit exception alias matching
   const lineHits = new Map<string, InventoryProduct[]>();
   const matchedProductIds = new Set<string>();
-  const manifestByProductId = new Map<string, string>();
+  const manifestByProductId = new Map<string, ManifestMatchMeta>();
 
   const dedupeHits = (raw: InventoryProduct[]) => {
     const uniq = new Map<string, InventoryProduct>();
@@ -450,7 +498,12 @@ export function reconcileManifest(
       for (const h of hits) {
         matchedProductIds.add(h.id);
         if (!manifestByProductId.has(h.id)) {
-          manifestByProductId.set(h.id, line.item);
+          manifestByProductId.set(h.id, {
+            item: line.item,
+            description: line.description,
+            unitRetail: line.unitRetail,
+            qty: line.qty,
+          });
         }
       }
     }
@@ -475,7 +528,12 @@ export function reconcileManifest(
         for (const h of fallbackHits) {
           matchedProductIds.add(h.id);
           if (!manifestByProductId.has(h.id)) {
-            manifestByProductId.set(h.id, line.item);
+            manifestByProductId.set(h.id, {
+              item: line.item,
+              description: line.description,
+              unitRetail: line.unitRetail,
+              qty: line.qty,
+            });
           }
         }
       }
@@ -486,6 +544,19 @@ export function reconcileManifest(
   const appOnly = stock
     .filter((row) => row.isLocalOnly)
     .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0) || a.title.localeCompare(b.title));
+  const unmatchedLive = stock
+    .filter((row) => !row.manifestItem)
+    .sort(
+      (a, b) =>
+        b.quantity - a.quantity || a.title.localeCompare(b.title),
+    );
+  const dataGaps = stock
+    .filter((row) => isCatalogDataGap(row))
+    .sort(
+      (a, b) =>
+        (b.updatedAt ?? 0) - (a.updatedAt ?? 0) ||
+        a.title.localeCompare(b.title),
+    );
 
   const missing: GapRow[] = [];
   const shortfalls: GapRow[] = [];
@@ -591,6 +662,15 @@ export function reconcileManifest(
   const manifestUnits = lines.reduce((s, r) => s + r.qty, 0);
   const manifestExt = lines.reduce((s, r) => s + r.extRetail, 0);
 
+  const unmatchedLiveUnits = unmatchedLive.reduce((s, r) => s + r.quantity, 0);
+  const dataGapUnits = dataGaps.reduce((s, r) => s + r.quantity, 0);
+  const shortQtySkus = stock.filter(
+    (r) => typeof r.qtyDelta === "number" && r.qtyDelta < 0,
+  ).length;
+  const overQtySkus = stock.filter(
+    (r) => typeof r.qtyDelta === "number" && r.qtyDelta > 0,
+  ).length;
+
   const summary: AuditSummary = {
     generatedAt: new Date().toISOString(),
     lotId: lotIds[0] || "unknown",
@@ -606,6 +686,12 @@ export function reconcileManifest(
     unrecognizedBarcodeSkus,
     locatedSkus,
     matchedSkus,
+    unmatchedLiveSkus: unmatchedLive.length,
+    unmatchedLiveUnits,
+    dataGapSkus: dataGaps.length,
+    dataGapUnits,
+    shortQtySkus,
+    overQtySkus,
     missingSkus: missing.length,
     missingUnits,
     missingExtRetail: round2(missingExt),
@@ -646,6 +732,8 @@ export function reconcileManifest(
     summary,
     stock,
     appOnly,
+    unmatchedLive,
+    dataGaps,
     missing,
     shortfalls,
     acknowledged,

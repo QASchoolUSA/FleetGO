@@ -25,6 +25,10 @@ export type ConvexAdminProduct = {
   imageCount: number;
   /** Enrichment / storefront image URLs from Convex `products.images`. */
   imageUrls?: string[];
+  fitmentCount?: number;
+  specsCount?: number;
+  hasDescription?: boolean;
+  storeOfferCount?: number;
   createdAt?: number;
   updatedAt: number;
 };

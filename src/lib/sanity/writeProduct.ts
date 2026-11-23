@@ -209,7 +209,8 @@ export async function uploadImagesFromUrls(
       const contentType = response.headers.get("content-type") ?? "";
       if (contentType && !contentType.startsWith("image/")) continue;
       const buffer = Buffer.from(await response.arrayBuffer());
-      if (buffer.byteLength < 500 || buffer.byteLength > MAX_IMAGE_BYTES) continue;
+      // Reject blank CDN stubs (~40B–4KB gray placeholders) while allowing real thumbs.
+      if (buffer.byteLength < 8_000 || buffer.byteLength > MAX_IMAGE_BYTES) continue;
 
       const asset = await client.assets.upload("image", buffer, {
         filename: filenameFromUrl(url, index),

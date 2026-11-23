@@ -58,6 +58,10 @@ export type InventoryProduct = {
   catalogPhotoUrls?: string[];
   imageUrls?: string[];
   imageCount?: number;
+  fitmentCount?: number;
+  specsCount?: number;
+  hasDescription?: boolean;
+  storeOfferCount?: number;
   createdAt?: number;
   updatedAt?: number;
 };
@@ -85,8 +89,18 @@ export type StockRow = {
   webSyncError?: string;
   catalogPhotoCount: number;
   catalogPhotoUrls: string[];
+  fitmentCount: number;
+  specsCount: number;
+  hasDescription: boolean;
+  storeOfferCount: number;
   updatedAt?: number;
   manifestItem?: string;
+  manifestDescription?: string;
+  manifestUnitRetail?: number;
+  /** Manifest lot qty when this Convex SKU matched a line. */
+  manifestQty?: number;
+  /** Live qty − manifest qty (negative = short vs lot). */
+  qtyDelta?: number;
 };
 
 export type GapMatch = {
@@ -147,6 +161,16 @@ export type AuditSummary = {
   unrecognizedBarcodeSkus: number;
   locatedSkus: number;
   matchedSkus: number;
+  /** Live Convex SKUs with no matching manifest line. */
+  unmatchedLiveSkus: number;
+  unmatchedLiveUnits: number;
+  /** Live SKUs missing price, description, or specs. */
+  dataGapSkus: number;
+  dataGapUnits: number;
+  /** Matched live SKUs with qty below manifest. */
+  shortQtySkus: number;
+  /** Matched live SKUs with qty above manifest. */
+  overQtySkus: number;
   missingSkus: number;
   missingUnits: number;
   missingExtRetail: number;
@@ -177,6 +201,10 @@ export type ManifestAuditResult = {
   summary: AuditSummary;
   stock: StockRow[];
   appOnly: StockRow[];
+  /** Live inventory with no B-Stock manifest match. */
+  unmatchedLive: StockRow[];
+  /** Live inventory missing price / description / specs. */
+  dataGaps: StockRow[];
   missing: GapRow[];
   shortfalls: GapRow[];
   acknowledged: GapRow[];

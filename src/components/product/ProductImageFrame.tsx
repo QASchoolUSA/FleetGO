@@ -17,6 +17,7 @@ export function ProductImageFrame({
   src,
   alt,
   sizes,
+  preload,
   priority = false,
   className,
   variant = "card",
@@ -26,6 +27,7 @@ export function ProductImageFrame({
   src?: string | null;
   alt: string;
   sizes: string;
+  preload?: boolean;
   priority?: boolean;
   className?: string;
   variant?: ProductImageVariant;
@@ -41,12 +43,13 @@ export function ProductImageFrame({
     );
   }
 
+  const shouldPreload = preload ?? priority;
   const image = (
     <Image
       src={src}
       alt={alt}
       fill
-      priority={priority}
+      preload={shouldPreload}
       className={cn("object-contain object-center", imageClassName)}
       sizes={sizes}
     />

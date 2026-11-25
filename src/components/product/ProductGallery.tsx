@@ -24,7 +24,7 @@ export function ProductGallery({
         src={current.url}
         alt={current.alt || title}
         variant="gallery"
-        priority
+        preload
         fadeKey={current.url}
         sizes="(max-width: 768px) 100vw, 50vw"
         className="aspect-square rounded-xl"

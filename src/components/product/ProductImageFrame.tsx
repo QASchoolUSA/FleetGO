@@ -43,6 +43,7 @@ export function ProductImageFrame({
     );
   }
 
+  const hasPositionClass = /\b(?:relative|absolute|fixed|sticky|static)\b/.test(className ?? "");
   const shouldPreload = preload ?? priority;
   const image = (
     <Image
@@ -57,7 +58,11 @@ export function ProductImageFrame({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-[var(--surface)]", className)}
+      className={cn(
+        !hasPositionClass && "relative",
+        "overflow-hidden bg-[var(--surface)]",
+        className,
+      )}
     >
       {fadeKey ? (
         <motion.div

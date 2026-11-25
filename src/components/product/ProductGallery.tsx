@@ -37,7 +37,7 @@ export function ProductGallery({
               type="button"
               onClick={() => setActive(index)}
               className={cn(
-                "relative h-16 w-16 shrink-0 overflow-hidden rounded-md border",
+                "relative block h-16 w-16 shrink-0 overflow-hidden rounded-md border",
                 index === active ? "border-[var(--field)]" : "border-[var(--line)]",
               )}
             >
@@ -46,7 +46,7 @@ export function ProductGallery({
                 alt=""
                 variant="thumb"
                 sizes="64px"
-                className="absolute inset-0"
+                className="h-full w-full"
               />
             </button>
           ))}

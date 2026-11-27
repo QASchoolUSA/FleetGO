@@ -43,7 +43,7 @@ export function Header({ navCategories }: { navCategories: CatalogCategory[] }) 
         <div className="bg-[var(--field)] text-[var(--surface)]">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-xs sm:px-6">
             <p className="truncate">
-              Same-day cut-off 3 PM CT · Free shipping over $99*
+              Same-day cut-off 3 PM CT · USPS Ground Advantage at checkout
             </p>
             <a href="tel:18005550188" className="shrink-0 font-medium hover:underline">
               (800) 555-0188

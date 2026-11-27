@@ -14,7 +14,7 @@ export default function CheckoutPage() {
         Checkout
       </h1>
       <p className="mt-3 text-[var(--ink-muted)]">
-        Review your cart, then continue to Stripe for secure payment.
+        Enter your U.S. delivery address to get an item-by-item USPS Ground Advantage quote, then continue to secure payment.
       </p>
       <div className="mt-8 rounded-lg border border-[var(--line)] p-5">
         <CheckoutButton />

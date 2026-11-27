@@ -15,6 +15,7 @@ import { config as loadEnv } from "dotenv";
 import { getCatalog } from "../src/lib/catalog/adapter";
 import { buildMerchantFeed } from "../src/lib/google/merchantFeed";
 import { merchantFeedConfig } from "../src/lib/google/merchantFeedConfig";
+import { getPackageProfileForProduct } from "../src/lib/shipping/packageProfiles";
 
 loadEnv({ path: ".env.local" });
 loadEnv();
@@ -31,6 +32,12 @@ async function main() {
   console.log(`Building Google Merchant feed from ${products.length} products (${source})…`);
 
   const { tsv, included, skipped, warnings } = buildMerchantFeed(products);
+  const packageConfidence = { high: 0, medium: 0, low: 0, missing: 0 };
+  for (const product of products) {
+    const profile = getPackageProfileForProduct(product);
+    if (profile) packageConfidence[profile.confidence] += 1;
+    else packageConfidence.missing += 1;
+  }
 
   mkdirSync(OUT_DIR, { recursive: true });
   const tsvPath = join(OUT_DIR, "google-merchant.tsv");
@@ -71,7 +78,7 @@ ${source}
 | Country / language | ${merchantFeedConfig.targetCountry} / ${merchantFeedConfig.contentLanguage} |
 | Currency | ${merchantFeedConfig.currency} |
 | google_product_category | ${merchantFeedConfig.googleProductCategory} |
-| shipping (feed column) | ${merchantFeedConfig.shipping || "(none — use Merchant Center shipping)"} |
+| Shipping origin / service | ${merchantFeedConfig.shippingOriginZip} / ${merchantFeedConfig.shippingService} |
 
 ## Counts
 
@@ -80,11 +87,22 @@ ${source}
 | Catalog products | ${products.length} |
 | Included in feed | ${included.length} |
 | Skipped | ${skipped.length} |
-| With barcode warnings | ${warnings.length} |
+| With feed warnings | ${warnings.length} |
 | Skipped: missing_image | ${byReason("missing_image")} |
 | Skipped: invalid_price | ${byReason("invalid_price")} |
 | Skipped: missing_brand | ${byReason("missing_brand")} |
 | Skipped: missing_gtin_and_mpn | ${byReason("missing_gtin_and_mpn")} |
+| Skipped: missing_package_profile | ${byReason("missing_package_profile")} |
+| Skipped: duplicate_id | ${byReason("duplicate_id")} |
+
+## Package profile confidence
+
+| Confidence | Products |
+|------------|---------:|
+| High | ${packageConfidence.high} |
+| Medium | ${packageConfidence.medium} |
+| Low | ${packageConfidence.low} |
+| Missing | ${packageConfidence.missing} |
 
 ## Outputs
 
@@ -99,7 +117,7 @@ ${source}
 |----|-------|---------|
 ${skippedLines || "| — | — | none |"}
 
-## Barcode warnings (first 30)
+## Feed warnings (first 30)
 
 | id | title | warnings |
 |----|-------|----------|

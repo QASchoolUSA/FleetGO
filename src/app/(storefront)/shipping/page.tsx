@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Shipping",
-  description: "FleetGo shipping policies for continental US parts orders.",
+  description: "FleetGo U.S. shipping rates, delivery timing, and package details.",
   alternates: { canonical: "/shipping" },
 };
 
@@ -13,8 +13,8 @@ export default function ShippingPage() {
         Shipping
       </h1>
       <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--ink-muted)]">
-        <p>Orders placed before 3 PM CT on business days typically ship the same day when items are in stock.</p>
-        <p>Free ground shipping applies to qualifying continental US orders over $99 before tax. Oversized freight and hazardous items may require additional charges shown at checkout.</p>
+        <p>U.S. orders ship from Haines City, Florida 33844. In-stock orders placed before 3 PM CT on business days typically ship the same day.</p>
+        <p>USPS Ground Advantage shipping is calculated at checkout from your delivery ZIP code and the package estimates for each item and quantity. The rate shown before payment is the amount added to your order.</p>
         <p>You will receive tracking once the carrier scans your package. For fleet drop-ships or will-call, contact the parts desk.</p>
       </div>
     </article>

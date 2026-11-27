@@ -1,7 +1,7 @@
 import { isValidGtin, normalizeBarcode } from "@/lib/catalog/barcode";
 import type { CatalogProduct, ProductSpec } from "@/lib/catalog/types";
-import { absoluteUrl } from "@/lib/seo";
 import { merchantFeedConfig } from "@/lib/google/merchantFeedConfig";
+import { getPackageProfileForProduct } from "@/lib/shipping/packageProfiles";
 
 /** Google Merchant Center TSV column order (primary feed). */
 export const MERCHANT_FEED_COLUMNS = [
@@ -19,7 +19,11 @@ export const MERCHANT_FEED_COLUMNS = [
   "condition",
   "google_product_category",
   "product_type",
-  "shipping",
+  "shipping_weight",
+  "shipping_length",
+  "shipping_width",
+  "shipping_height",
+  "shipping_label",
 ] as const;
 
 export type MerchantFeedColumn = (typeof MERCHANT_FEED_COLUMNS)[number];
@@ -30,7 +34,9 @@ export type MerchantFeedSkipReason =
   | "missing_image"
   | "invalid_price"
   | "missing_brand"
-  | "missing_gtin_and_mpn";
+  | "missing_gtin_and_mpn"
+  | "missing_package_profile"
+  | "duplicate_id";
 
 export type MerchantFeedItemResult =
   | { ok: true; row: MerchantFeedRow; warnings: string[] }
@@ -75,8 +81,17 @@ function detectCondition(specs: ProductSpec[]): "new" | "refurbished" | "used" {
   return "new";
 }
 
-function productId(product: CatalogProduct): string {
-  return (product.sku || product.barcode || product.id).trim();
+function stableProductId(product: CatalogProduct, duplicateIdentifier: boolean): string {
+  const base = (product.sku || product.barcode || product.id || product.slug).trim();
+  if (!duplicateIdentifier && base.length <= 50) return base;
+
+  let hash = 2166136261;
+  for (const char of product.id || product.slug || base) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  const suffix = (hash >>> 0).toString(36).padStart(7, "0").slice(0, 7);
+  return `${base.slice(0, 42)}-${suffix}`.slice(0, 50);
 }
 
 function productDescription(product: CatalogProduct): string {
@@ -89,11 +104,16 @@ function productDescription(product: CatalogProduct): string {
 /**
  * Map a catalog product to a Merchant Center feed row, or return skip reasons.
  */
-export function mapProductToMerchantFeed(product: CatalogProduct): MerchantFeedItemResult {
+export function mapProductToMerchantFeed(
+  product: CatalogProduct,
+  duplicateIdentifier = false,
+): MerchantFeedItemResult {
   const warnings: string[] = [];
   const reasons: MerchantFeedSkipReason[] = [];
-  const id = productId(product);
+  const id = stableProductId(product, duplicateIdentifier);
   const title = product.title?.trim() || id;
+
+  if (!id || id.length > 50) reasons.push("duplicate_id");
 
   const imageLink = product.images[0]?.url?.trim() || "";
   if (!imageLink) reasons.push("missing_image");
@@ -109,6 +129,15 @@ export function mapProductToMerchantFeed(product: CatalogProduct): MerchantFeedI
   const gtin = isValidGtin(barcode) ? barcode.id : "";
   const mpn = product.mpn?.trim() || "";
   if (!gtin && !mpn) reasons.push("missing_gtin_and_mpn");
+
+  const packageProfile = getPackageProfileForProduct(product);
+  if (!packageProfile) {
+    reasons.push("missing_package_profile");
+  } else if (packageProfile.confidence === "low") {
+    warnings.push("Package weight and dimensions use a low-confidence category estimate.");
+  } else if (packageProfile.confidence === "medium") {
+    warnings.push("Package dimensions include an estimate and should be verified.");
+  }
 
   if (reasons.length) {
     return { ok: false, productId: id, title, reasons, warnings };
@@ -127,7 +156,7 @@ export function mapProductToMerchantFeed(product: CatalogProduct): MerchantFeedI
     id,
     title: product.title.trim(),
     description: productDescription(product),
-    link: absoluteUrl(`/p/${product.slug}`),
+    link: new URL(`/p/${product.slug}`, merchantFeedConfig.siteUrl).toString(),
     image_link: imageLink,
     additional_image_link: additional,
     availability: mapAvailability(product.stockStatus),
@@ -138,7 +167,11 @@ export function mapProductToMerchantFeed(product: CatalogProduct): MerchantFeedI
     condition: detectCondition(product.specs || []),
     google_product_category: merchantFeedConfig.googleProductCategory,
     product_type: productType,
-    shipping: merchantFeedConfig.shipping,
+    shipping_weight: `${packageProfile!.weightLb.toFixed(2)} lb`,
+    shipping_length: `${packageProfile!.lengthIn} in`,
+    shipping_width: `${packageProfile!.widthIn} in`,
+    shipping_height: `${packageProfile!.heightIn} in`,
+    shipping_label: packageProfile!.shippingLabel,
   };
 
   return { ok: true, row, warnings };
@@ -154,8 +187,27 @@ export function buildMerchantFeed(products: CatalogProduct[]): {
   const skipped: Extract<MerchantFeedItemResult, { ok: false }>[] = [];
   const warnings: { productId: string; title: string; warnings: string[] }[] = [];
 
+  const identifierCounts = new Map<string, number>();
   for (const product of products) {
-    const result = mapProductToMerchantFeed(product);
+    const identifier = (product.sku || product.barcode || product.id || product.slug).trim().toLowerCase();
+    if (identifier) identifierCounts.set(identifier, (identifierCounts.get(identifier) || 0) + 1);
+  }
+  const usedIds = new Set<string>();
+
+  for (const product of products) {
+    const identifier = (product.sku || product.barcode || product.id || product.slug).trim().toLowerCase();
+    const duplicateIdentifier = (identifierCounts.get(identifier) || 0) > 1;
+    const result = mapProductToMerchantFeed(product, duplicateIdentifier);
+    if (result.ok && usedIds.has(result.row.id)) {
+      skipped.push({
+        productId: result.row.id,
+        title: result.row.title,
+        reasons: ["duplicate_id"],
+        warnings: result.warnings,
+      });
+      continue;
+    }
+    if (result.ok) usedIds.add(result.row.id);
     if (result.warnings.length) {
       warnings.push({
         productId: result.ok ? result.row.id : result.productId,

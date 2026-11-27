@@ -1,11 +1,11 @@
 # Google Merchant Center product feed
 
-FleetGo serves a **TSV primary feed** from the live Sanity catalog for scheduled pulls in Google Merchant Center (free listings / Shopping).
+FleetGo serves a **TSV primary feed** from the production Sanity catalog for scheduled pulls in Google Merchant Center free listings. The feed refuses sample data or a partial catalog.
 
 ## Local validation
 
-1. Ensure `.env.local` has `NEXT_PUBLIC_SITE_URL` (production: `https://fleetgollc.com`) and Sanity credentials (see `.env.example`).
-2. Prefer publishing the real catalog to Sanity first (Convex inventory sync → FleetGo).
+1. Ensure Sanity is configured with the production catalog. Local sample data is not suitable for launch validation.
+2. `src/lib/shipping/product-package-profiles.json` contains the package profiles used by both the feed and checkout. Most profiles are low-confidence category estimates, not measured cartons; see the report's confidence counts and replace them with measured packed dimensions and weights as they become available.
 3. From the FLEETGO repo root:
 
 ```bash
@@ -19,7 +19,7 @@ npm run export:google-merchant
 | `google-merchant.tsv` | Local copy of the feed |
 | `google-merchant-report.md` | Included / skipped counts and reasons |
 
-Fix skipped products (missing image, brand, or both GTIN and MPN) before relying on Merchant Center.
+Fix skipped products (missing image, brand, GTIN/MPN, package profile, or unique item ID) before relying on Merchant Center. The live route returns an error instead of publishing a partial feed.
 
 ## Live feed URL
 
@@ -32,7 +32,7 @@ GOOGLE_MERCHANT_FEED_SECRET=your-long-random-secret
 Feed endpoint:
 
 ```text
-https://fleetgollc.com/api/feeds/google-merchant?key=<GOOGLE_MERCHANT_FEED_SECRET>
+https://www.fleetgollc.com/api/feeds/google-merchant?key=<GOOGLE_MERCHANT_FEED_SECRET>
 ```
 
 Auth alternatives:
@@ -45,25 +45,23 @@ Unauthenticated requests return `401`. Missing secret returns `503`.
 ## Merchant Center setup
 
 1. Open [Google Merchant Center](https://merchants.google.com/) for the account that already claims **fleetgollc.com**.
-2. **Products → Feeds → Add feed** (or edit primary feed).
-3. Choose **Scheduled fetch**.
-4. File URL: the live feed URL above (include the `key`).
-5. File type: **TSV** / tab-delimited.
-6. Fetch schedule: daily (or more often if stock/price changes frequently).
-7. Confirm:
+2. Add a primary source using **Scheduled fetch**. Keep the existing Merchant API source unchanged.
+3. File URL: the live feed URL above (include the `key`); file type **TSV**; schedule daily; country US, language English, destination Free listings.
+4. Configure USPS Ground Advantage rates from origin ZIP 33844 and match each `shipping_label` group to its nonstandard-fee adjustment.
+5. Configure a 30-day returns policy with free return shipping, and ensure the website policy matches.
+6. Confirm:
    - Website claimed / verified
-   - Shipping and returns policies
-   - Free listings (and Shopping ads programs if you use them)
-8. After the first fetch, open **Diagnostics** / disapprovals and reconcile with `google-merchant-report.md`.
+   - Free listings enabled; no paid Shopping ads are configured by this integration
+7. After the first fetch, open **Diagnostics** / disapprovals and reconcile with `google-merchant-report.md`.
 
 ## Attribute mapping
 
 | GMC column | FleetGo source |
 |------------|----------------|
-| `id` | `sku` (fallback barcode / Sanity id) |
+| `id` | Unique SKU-based ID (duplicate SKUs use a stable product-ID hash suffix; maximum 50 characters) |
 | `title` | product title |
 | `description` | description → shortDescription |
-| `link` | `{NEXT_PUBLIC_SITE_URL}/p/{slug}` |
+| `link` | `https://www.fleetgollc.com/p/{slug}` |
 | `image_link` | first image |
 | `additional_image_link` | remaining images (comma-separated) |
 | `availability` | stockStatus → `in_stock` / `out_of_stock` / `preorder` |
@@ -74,20 +72,26 @@ Unauthenticated requests return `401`. Missing secret returns `503`.
 | `condition` | `new` (or `refurbished` / `used` from specs) |
 | `google_product_category` | config default (Vehicles & Parts…) |
 | `product_type` | category titles |
-| `shipping` | optional US row from [`merchantFeedConfig.ts`](../src/lib/google/merchantFeedConfig.ts) |
+| `shipping_weight`, `shipping_length`, `shipping_width`, `shipping_height` | exact SKU match or explicit title alias from the package profile file |
+| `shipping_label` | Ground Advantage fee class derived from estimated package length and volume |
 
-Eligibility skips: no image, price ≤ 0, no brand, or neither valid GTIN nor MPN. Out-of-stock items remain in the feed with `availability = out_of_stock`.
+Eligibility skips: no image, price ≤ 0, no brand, neither valid GTIN nor MPN, no unique ID, or no package profile. Out-of-stock items remain in the feed with `availability = out_of_stock`.
 
 ## Config
 
 Edit [`src/lib/google/merchantFeedConfig.ts`](../src/lib/google/merchantFeedConfig.ts) for:
 
 - `googleProductCategory`
-- `shipping` feed column (or clear it and rely on Merchant Center shipping only)
+- `siteUrl` (canonical host)
+- `shippingOriginZip` and `shippingService`
 - `maxAdditionalImages`
+
+## Checkout shipping
+
+USPS Domestic Prices v3 credentials are server-only. Add `USPS_CLIENT_ID`, `USPS_CLIENT_SECRET`, and `USPS_ENVIRONMENT` to the deployment environment. USPS Developer Portal app access must include Domestic Pricing. Checkout collects a U.S. address first, calculates each item and quantity separately, and passes the fee and destination to Stripe. If USPS rates are unavailable or a package profile is missing, checkout fails with an explanation rather than charging zero.
 
 ## What is not included
 
 - Google Content API push sync
 - Google Ads / Shopping campaign creation
-- Per-SKU shipping weight/dims (use Merchant Center shipping or extend config later)
+- Product package profiles are estimates for most SKUs; measure cartons to improve rate accuracy

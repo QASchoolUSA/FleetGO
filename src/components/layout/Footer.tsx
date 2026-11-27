@@ -75,7 +75,7 @@ export function Footer({ shopCategories }: { shopCategories: CatalogCategory[] }
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {new Date().getFullYear()} FleetGo. All rights reserved.</p>
-          <p>*Free shipping on qualifying continental US orders over $99 before tax.</p>
+          <p>U.S. shipping is calculated at checkout with USPS Ground Advantage.</p>
         </div>
       </div>
     </footer>
